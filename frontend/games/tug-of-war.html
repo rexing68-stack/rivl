@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tug of War – Minigame Arena</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .click-btn {
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            transition: transform 0.1s;
+        }
+
+        .click-btn:active {
+            transform: scale(0.95);
+        }
+
+        .score {
+            font-size: 2rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="/" class="nav-link">Home</a>
+    </div>
+    <div class="game-container">
+        <h1>Tug of War</h1>
+        <p>Premi il pulsante il più velocemente possibile per 5 secondi!</p>
+        <button id="clickBtn" class="click-btn">Click!</button>
+        <div class="score" id="score">0</div>
+        <div id="timer">Tempo rimasto: 5s</div>
+    </div>
+    <script>
+        const btn = document.getElementById('clickBtn');
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        let score = 0;
+        let timeLeft = 5;
+        let interval;
+        btn.addEventListener('click', () => {
+            if (timeLeft <= 0) return;
+            score++;
+            scoreEl.textContent = score;
+        });
+        function startTimer() {
+            interval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = `Tempo rimasto: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = true;
+                    alert(`Tempo finito! Hai totalizzato ${score} click.`);
+                }
+            }, 1000);
+        }
+        startTimer();
+    </script>
+</body>
+
+</html>

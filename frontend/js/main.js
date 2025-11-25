@@ -91,14 +91,16 @@ async function loadGames() {
         {
             id: 'tug-of-war',
             name: 'Tiro alla fune',
-            desc: 'Clicca più velocemente!',
-            img: '../assets/tug.png'
+            desc: 'Premi il pulsante il più velocemente possibile per 5 secondi!',
+            img: './assets/tug.png',
+            page: './games/tug-of-war.html'
         },
         {
-            id: 'outdoor-mission',
-            name: 'Missione Outdoor',
-            desc: 'Raggiungi 500 m e scansiona l’oggetto.',
-            img: '../assets/outdoor.png'
+            id: 'reaction-test',
+            name: 'Reaction Test',
+            desc: 'Clicca appena il cerchio diventa rosso.',
+            img: './assets/reaction.png',
+            page: './games/reaction-test.html'
         }
     ];
 
