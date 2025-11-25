@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: minigame-arena-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
