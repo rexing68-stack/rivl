@@ -6,7 +6,8 @@
         "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
         "dev:frontend": "vite --open",
         "dev:backend": "node server/server.js",
-        "build": "vite build frontend"
+        "build": "vite build",
+        "preview": "vite preview"
     },
     "dependencies": {
         "express": "^5.1.0",
