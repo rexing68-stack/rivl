@@ -1,0 +1,38 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors({ origin: true }));
+app.use(express.json());
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
+console.log('Supabase URL:', process.env.SUPABASE_URL ? 'Loaded' : 'Missing');
+console.log('Supabase Key:', process.env.SUPABASE_ANON_KEY ? 'Loaded' : 'Missing');
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/games', require('./routes/games'));
+app.use('/api/payments', require('./routes/payments'));
+
+app.get('/api/config', (req, res) => {
+    res.json({
+        SUPABASE_URL: process.env.SUPABASE_URL,
+        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
+    });
+});
+
+// Catch-all removed temporarily to fix Express 5 compatibility issue
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+// });
+
+app.listen(PORT, () => console.log(`🚀 Server listening on http://localhost:${PORT}`));

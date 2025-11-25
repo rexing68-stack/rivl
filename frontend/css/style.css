@@ -1,0 +1,259 @@
+/* ==================== DESIGN TOKENS ==================== */
+:root {
+  --font-primary: 'Inter', system-ui, sans-serif;
+  --bg-primary: #0a0a0a;
+  --bg-panel: #161618;
+  --bg-glass: rgba(22, 22, 24, .85);
+  --glass-blur: 12px;
+  --primary: #ff3b30;
+  /* neon red */
+  --accent: #00e599;
+  /* neon green */
+  --text-main: #ededed;
+  --text-muted: #a1a1aa;
+}
+
+/* Reset & base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: var(--font-primary);
+  background: var(--bg-primary);
+  color: var(--text-main);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ==================== GLASSMORPHISM ==================== */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, .4);
+}
+
+/* ==================== HEADER ==================== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--primary);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  font-weight: 600;
+  padding: 0.4rem 0.2rem;
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  opacity: 1;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: transform .1s, box-shadow .2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 12px var(--primary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.btn-ghost:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, .05);
+}
+
+/* ==================== HERO ==================== */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  margin: 2rem;
+  background: linear-gradient(135deg, #ff3b30 0%, #00e599 100%);
+  color: #fff;
+  border-radius: 16px;
+}
+
+.hero h1 {
+  font-size: 2.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==================== GAMES GRID ==================== */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.game-card {
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .4);
+}
+
+.game-card img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 0.8rem;
+}
+
+.game-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+  color: var(--primary);
+}
+
+.game-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ==================== MODAL ==================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, .6);
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-content {
+  animation: fadeIn .2s ease-out;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary);
+}
+
+.auth-switch {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.auth-switch a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.message {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
