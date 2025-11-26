@@ -17,7 +17,7 @@ async function loadEnv() {
     // OR we can create a config.js file that is gitignored.
 
     // Let's try to fetch a config endpoint we will create on the server.
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const API_URL = (import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000';
     try {
         // We will add a /api/config endpoint to server.js to serve safe public keys
         const res = await fetch(`${API_URL}/api/config`);
@@ -178,7 +178,7 @@ async function handleAuth(e) {
     authMessage.style.color = 'var(--text-muted)';
 
     try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const API_URL = (import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:3000';
         const endpoint = isLoginMode ? `${API_URL}/api/auth/login` : `${API_URL}/api/auth/register`;
         const res = await fetch(endpoint, {
             method: 'POST',
