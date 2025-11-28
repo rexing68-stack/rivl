@@ -94,7 +94,8 @@ async function connectMetaMask() {
 /* ---- Caricamento giochi ---- */
 async function loadGames() {
     // In un’app reale questi dati verrebbero da Supabase.
-    const games = [
+    // In un’app reale questi dati verrebbero da Supabase.
+    window.games = [
         {
             id: 'tug-of-war',
             name: 'Tiro alla fune',
@@ -112,7 +113,7 @@ async function loadGames() {
     ];
 
     if (gamesGrid) {
-        gamesGrid.innerHTML = games.map(g => `
+        gamesGrid.innerHTML = window.games.map(g => `
         <div class="game-card glass" data-id="${g.id}">
           <img src="${g.img}" alt="${g.name}" onerror="this.src='https://placehold.co/80x80?text=Game'">
           <h3>${g.name}</h3>
@@ -134,14 +135,18 @@ async function loadGames() {
 
 /* ---- Avvio di un gioco (demo) ---- */
 function startGame(gameId) {
-    if (!userAddress) {
-        alert('Devi prima collegare il wallet.');
-        openWalletModal();
-        return;
-    }
+    // if (!userAddress) {
+    //     alert('Devi prima collegare il wallet.');
+    //     openWalletModal();
+    //     return;
+    // }
     // Qui apriremmo una pagina di gioco o un modal.
     // Per la demo mostriamo solo un alert.
-    alert(`Avvio ${gameId} – il wallet ${userAddress} è pronto!`);
+    // alert(`Avvio ${gameId} – il wallet ${userAddress} è pronto!`);
+    const game = games.find(g => g.id === gameId);
+    if (game) {
+        window.location.href = game.page;
+    }
 }
 
 /* ==================== AUTH UI ==================== */
