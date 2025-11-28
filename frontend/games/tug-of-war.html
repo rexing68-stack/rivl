@@ -309,7 +309,7 @@
         let balance = 50; // 0 = Enemy Wins, 100 = Player Wins, 50 = Neutral
         let cursorPosition = 0;
         let cursorDirection = 1; // 1 = right, -1 = left
-        let cursorSpeed = 1.5; // Increases as you play
+        let cursorSpeed = 0.8; // Increases as you play
 
         // DOM Elements
         const beamLeft = document.getElementById('beamLeft');
@@ -420,14 +420,14 @@
                 const power = 4 * accuracy + 1.5;
 
                 balance += power;
-                cursorSpeed = Math.min(cursorSpeed + 0.05, 4); // Slower speed increase
+                cursorSpeed = Math.min(cursorSpeed + 0.03, 2.5); // Slower speed increase
 
                 playSound('hit');
                 createFeedback('PERFECT!', 'var(--neon-blue)');
             } else {
                 // MISS!
                 balance -= 3; // Reduced penalty
-                cursorSpeed = Math.max(cursorSpeed - 0.2, 1.5);
+                cursorSpeed = Math.max(cursorSpeed - 0.2, 0.8);
 
                 playSound('miss');
                 document.body.classList.add('shake');
