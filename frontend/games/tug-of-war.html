@@ -393,58 +393,6 @@
                 cursorDirection = 1;
             }
 
-            cursor.style.left = `${cursorPosition}%`;
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function enemyAI() {
-            if (!gameActive) return;
-
-            // Enemy pushes back constantly but slowly
-            // If player is winning (balance > 50), enemy fights harder
-            const pressure = 0.1 + (balance > 50 ? 0.15 : 0);
-
-            balance -= pressure;
-            checkWinCondition();
-            updateVisuals();
-
-            if (gameActive) requestAnimationFrame(enemyAI);
-        }
-
-        function handleInput() {
-            if (!gameActive) return;
-
-            // Check Hit
-            if (cursorPosition >= SWEET_SPOT_START && cursorPosition <= SWEET_SPOT_END) {
-                // HIT!
-                const accuracy = 1 - (Math.abs(cursorPosition - (SWEET_SPOT_START + SWEET_SPOT_WIDTH / 2)) / (SWEET_SPOT_WIDTH / 2));
-                const power = 5 * accuracy + 2; // Base push + accuracy bonus
-
-                balance += power;
-                cursorSpeed = Math.min(cursorSpeed + 0.1, 4); // Game gets faster
-
-                playSound('hit');
-                createFeedback('PERFECT!', 'var(--neon-blue)');
-            } else {
-                // MISS!
-                balance -= 5; // Penalty
-                cursorSpeed = Math.max(cursorSpeed - 0.2, 1.5); // Slow down slightly on fail
-
-                playSound('miss');
-                document.body.classList.add('shake');
-                setTimeout(() => document.body.classList.remove('shake'), 300);
-                createFeedback('MISS', 'var(--neon-red)');
-            }
-
-            checkWinCondition();
-            updateVisuals();
-        }
-
-        function createFeedback(text, color) {
-            const el = document.createElement('div');
-            el.classList.add('hit-effect');
-            el.textContent = text;
             el.style.color = color;
             el.style.left = '50%';
             el.style.top = '70%';
