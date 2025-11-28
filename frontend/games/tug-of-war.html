@@ -94,7 +94,6 @@
             bottom: 0;
             left: 0;
             width: 50%;
-            /* Dynamic */
             background: linear-gradient(90deg, rgba(0, 243, 255, 0.2) 0%, rgba(0, 243, 255, 1) 100%);
             box-shadow: 0 0 30px var(--neon-blue);
             transition: width 0.1s linear;
@@ -106,7 +105,6 @@
             bottom: 0;
             right: 0;
             width: 50%;
-            /* Dynamic */
             background: linear-gradient(-90deg, rgba(255, 0, 85, 0.2) 0%, rgba(255, 0, 85, 1) 100%);
             box-shadow: 0 0 30px var(--neon-red);
             transition: width 0.1s linear;
@@ -159,7 +157,6 @@
             bottom: 0;
             left: 40%;
             width: 20%;
-            /* The hit zone */
             background: rgba(0, 243, 255, 0.3);
             border-left: 2px solid var(--neon-blue);
             border-right: 2px solid var(--neon-blue);
@@ -393,6 +390,59 @@
                 cursorDirection = 1;
             }
 
+            cursor.style.left = `${cursorPosition}%`;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function enemyAI() {
+            if (!gameActive) return;
+
+            // Enemy pushes back constantly but slowly
+            // Reduced pressure to make the game last longer
+            const pressure = 0.05 + (balance > 50 ? 0.05 : 0);
+
+            balance -= pressure;
+            checkWinCondition();
+            updateVisuals();
+
+            if (gameActive) requestAnimationFrame(enemyAI);
+        }
+
+        function handleInput() {
+            if (!gameActive) return;
+
+            // Check Hit
+            if (cursorPosition >= SWEET_SPOT_START && cursorPosition <= SWEET_SPOT_END) {
+                // HIT!
+                const accuracy = 1 - (Math.abs(cursorPosition - (SWEET_SPOT_START + SWEET_SPOT_WIDTH / 2)) / (SWEET_SPOT_WIDTH / 2));
+                // Reduced power slightly to prevent instant wins
+                const power = 4 * accuracy + 1.5;
+
+                balance += power;
+                cursorSpeed = Math.min(cursorSpeed + 0.05, 4); // Slower speed increase
+
+                playSound('hit');
+                createFeedback('PERFECT!', 'var(--neon-blue)');
+            } else {
+                // MISS!
+                balance -= 3; // Reduced penalty
+                cursorSpeed = Math.max(cursorSpeed - 0.2, 1.5);
+
+                playSound('miss');
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 300);
+                createFeedback('MISS', 'var(--neon-red)');
+            }
+
+            checkWinCondition();
+            updateVisuals();
+        }
+
+        function createFeedback(text, color) {
+            const el = document.createElement('div');
+            el.classList.add('hit-effect');
+            el.textContent = text;
             el.style.color = color;
             el.style.left = '50%';
             el.style.top = '70%';
