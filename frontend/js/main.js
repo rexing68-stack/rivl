@@ -98,10 +98,17 @@ async function loadGames() {
     window.games = [
         {
             id: 'tug-of-war',
-            name: 'Tiro alla fune',
-            desc: 'Premi il pulsante il più velocemente possibile per 5 secondi!',
+            name: 'Neon Overload',
+            desc: 'Premi al momento giusto per battere il bot!',
             img: './assets/tug.png',
             page: '/games/tug-of-war.html'
+        },
+        {
+            id: 'click-frenzy',
+            name: 'Click Frenzy',
+            desc: 'Clicca il più velocemente possibile in 10 secondi!',
+            img: './assets/click.png',
+            page: '/games/click-frenzy.html'
         },
         {
             id: 'reaction-test',

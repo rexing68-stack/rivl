@@ -18,6 +18,7 @@ export default defineConfig({
             input: {
                 main: 'frontend/index.html',
                 tug: 'frontend/games/tug-of-war.html',
+                click: 'frontend/games/click-frenzy.html',
                 reaction: 'frontend/games/reaction-test.html'
             }
         }
