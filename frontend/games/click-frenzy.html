@@ -330,34 +330,6 @@
             }
         }
 
-        /* Health bars */
-        .health-bar-container {
-            position: absolute;
-            top: -30px;
-            width: 120px;
-            height: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #333;
-            border-radius: 10px;
-            overflow: hidden;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .health-bar {
-            height: 100%;
-            transition: width 0.3s;
-            box-shadow: 0 0 10px currentColor;
-        }
-
-        .player-health {
-            background: var(--player-color);
-        }
-
-        .enemy-health {
-            background: var(--enemy-color);
-        }
-
         /* HUD */
         .hud {
             position: absolute;
@@ -547,9 +519,6 @@
 
         <!-- Player Soldier -->
         <div class="soldier player-soldier" id="playerSoldier">
-            <div class="health-bar-container">
-                <div class="health-bar player-health" id="playerHealth" style="width: 100%;"></div>
-            </div>
             <div class="soldier-body">
                 <div class="head">
                     <div class="helmet"></div>
@@ -571,9 +540,6 @@
 
         <!-- Enemy Soldier -->
         <div class="soldier enemy-soldier" id="enemySoldier">
-            <div class="health-bar-container">
-                <div class="health-bar enemy-health" id="enemyHealth" style="width: 100%;"></div>
-            </div>
             <div class="soldier-body">
                 <div class="head">
                     <div class="helmet"></div>
@@ -600,7 +566,7 @@
         </div>
 
         <!-- Timer -->
-        <div class="timer" id="timer">10</div>
+        <div class="timer" id="timer">30</div>
 
         <!-- Click button -->
         <button class="click-button pulsing" id="clickBtn">
@@ -619,17 +585,13 @@
     <script>
         let playerHits = 0;
         let enemyHits = 0;
-        let playerHealth = 100;
-        let enemyHealth = 100;
-        let timeLeft = 10;
+        let timeLeft = 30;
         let gameActive = false;
         let gameStarted = false;
 
         const arena = document.getElementById('arena');
         const playerSoldier = document.getElementById('playerSoldier');
         const enemySoldier = document.getElementById('enemySoldier');
-        const playerHealthBar = document.getElementById('playerHealth');
-        const enemyHealthBar = document.getElementById('enemyHealth');
         const playerScoreEl = document.getElementById('playerScore');
         const enemyScoreEl = document.getElementById('enemyScore');
         const timerEl = document.getElementById('timer');
@@ -675,9 +637,6 @@
             enemySoldier.classList.add('hit');
             setTimeout(() => enemySoldier.classList.remove('hit'), 300);
 
-            enemyHealth = Math.max(0, enemyHealth - 10);
-            enemyHealthBar.style.width = enemyHealth + '%';
-
             playSound('slash');
             setTimeout(() => playSound('hit'), 100);
         }
@@ -694,9 +653,6 @@
             playerSoldier.classList.add('hit');
             setTimeout(() => playerSoldier.classList.remove('hit'), 300);
 
-            playerHealth = Math.max(0, playerHealth - 10);
-            playerHealthBar.style.width = playerHealth + '%';
-
             playSound('slash');
             setTimeout(() => playSound('hit'), 100);
         }
@@ -706,7 +662,7 @@
 
             const delay = 140 + Math.random() * 110;
             setTimeout(() => {
-                if (gameActive && enemyHealth > 0) {
+                if (gameActive) {
                     enemyHits++;
                     enemyScoreEl.textContent = enemyHits;
                     enemySlash();
@@ -727,11 +683,11 @@
                 timeLeft--;
                 timerEl.textContent = timeLeft;
 
-                if (timeLeft <= 3) {
+                if (timeLeft <= 5) {
                     timerEl.style.color = '#ff0055';
                 }
 
-                if (timeLeft <= 0 || playerHealth <= 0 || enemyHealth <= 0) {
+                if (timeLeft <= 0) {
                     clearInterval(interval);
                     endGame();
                 }
@@ -746,25 +702,25 @@
             setTimeout(() => {
                 arena.classList.add('ko-cam');
 
-                if (playerHits > enemyHits || enemyHealth <= 0) {
+                if (playerHits > enemyHits) {
                     enemySoldier.classList.add('ko');
-                } else {
+                } else if (enemyHits > playerHits) {
                     playerSoldier.classList.add('ko');
                 }
 
                 setTimeout(() => {
-                    if (playerHits > enemyHits || enemyHealth <= 0) {
+                    if (playerHits > enemyHits) {
                         resultTitle.textContent = 'VICTORY!';
                         resultEl.classList.add('victory');
-                        finalStats.innerHTML = `You defeated the enemy warrior!<br>Strikes: ${playerHits} vs ${enemyHits}`;
-                    } else if (playerHits < enemyHits || playerHealth <= 0) {
-                        resultTitle.textContent = 'K.O.!';
+                        finalStats.innerHTML = `You struck faster!<br>Your strikes: ${playerHits}<br>Enemy strikes: ${enemyHits}`;
+                    } else if (playerHits < enemyHits) {
+                        resultTitle.textContent = 'DEFEAT!';
                         resultEl.classList.add('defeat');
-                        finalStats.innerHTML = `You were defeated!<br>Strikes: ${playerHits} vs ${enemyHits}`;
+                        finalStats.innerHTML = `The enemy was faster!<br>Your strikes: ${playerHits}<br>Enemy strikes: ${enemyHits}`;
                     } else {
                         resultTitle.textContent = 'DRAW!';
                         resultEl.classList.add('victory');
-                        finalStats.innerHTML = `Both warriors still standing!<br>Strikes: ${playerHits} vs ${enemyHits}`;
+                        finalStats.innerHTML = `Perfect match!<br>Both: ${playerHits} strikes`;
                     }
 
                     resultEl.classList.add('show');
@@ -777,7 +733,7 @@
                 startGame();
             }
 
-            if (!gameActive || playerHealth <= 0) return;
+            if (!gameActive) return;
 
             playerHits++;
             playerScoreEl.textContent = playerHits;
