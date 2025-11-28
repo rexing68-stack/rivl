@@ -387,6 +387,43 @@
                 cursorDirection = -1;
             } else if (cursorPosition <= 0) {
                 cursorPosition = 0;
+                cursorDirection = 1;
+            }
+
+            cursor.style.left = `${cursorPosition}%`;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function enemyAI() {
+            if (!gameActive) return;
+
+            // Enemy pushes back constantly but slowly
+            // Significantly reduced pressure to make the game winnable
+            const pressure = 0.02 + (balance > 50 ? 0.02 : 0);
+
+            balance -= pressure;
+            checkWinCondition();
+            updateVisuals();
+
+            if (gameActive) requestAnimationFrame(enemyAI);
+        }
+
+        function handleInput() {
+            if (!gameActive) return;
+
+            // Check Hit
+            if (cursorPosition >= SWEET_SPOT_START && cursorPosition <= SWEET_SPOT_END) {
+                // HIT!
+                const accuracy = 1 - (Math.abs(cursorPosition - (SWEET_SPOT_START + SWEET_SPOT_WIDTH / 2)) / (SWEET_SPOT_WIDTH / 2));
+                // Increased power to make winning possible
+                const power = 6 * accuracy + 2;
+
+                balance += power;
+                cursorSpeed = Math.min(cursorSpeed + 0.03, 2.5); // Slower speed increase
+
+                playSound('hit');
+                createFeedback('PERFECT!', 'var(--neon-blue)');
             } else {
                 // MISS!
                 balance -= 3; // Reduced penalty
