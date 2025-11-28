@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Precision Sniper – Minigame Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050505;
+            color: #00ffcc;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        .nav-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ffcc;
+            text-decoration: none;
+            font-size: 1rem;
+            border: 1px solid #00ffcc;
+            padding: 5px 15px;
+            background: rgba(0, 255, 204, 0.1);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .nav-back:hover {
+            background: rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+
+        /* Sci-Fi Grid Background */
+        .grid-bg {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image:
+                linear-gradient(rgba(0, 255, 204, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 60%, #000 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Game Area */
+        .game-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        /* Target Style */
+        .target {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 85, 0.8) 0%, rgba(255, 0, 85, 0.2) 60%, transparent 100%);
+            border: 2px solid #ff0055;
+            box-shadow: 0 0 15px #ff0055;
+            cursor: pointer;
+            transform: translate(-50%, -50%) scale(0);
+            animation: spawnPop 0.3s forwards;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .target::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.5);
+            animation: spin 4s linear infinite;
+        }
+
+        .target.golden {
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0.2) 60%, transparent 100%);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        @keyframes spawnPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+            }
+
+            70% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes hitEffect {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(2);
+                opacity: 0;
+            }
+        }
+
+        .hit-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffcc;
+            transform: translate(-50%, -50%) rotate(45deg);
+            pointer-events: none;
+            animation: hitAnim 0.3s forwards;
+            z-index: 20;
+        }
+
+        @keyframes hitAnim {
+            0% {
+                transform: translate(-50%, -50%) rotate(45deg) scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(45deg) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .score-float {
+            position: absolute;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: floatUp 0.8s forwards;
+            z-index: 20;
+            text-shadow: 0 0 5px #00ffcc;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translate(-50%, -50%) translateY(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) translateY(-30px);
+                opacity: 0;
+            }
+        }
+
+        /* HUD */
+        .hud {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 50px;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .hud-panel {
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #00ffcc;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+            text-align: center;
+        }
+
+        .hud-label {
+            font-size: 0.8rem;
+            color: #00aaaa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hud-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+
+        /* Start Screen / Game Over */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .overlay h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #00ffcc;
+            text-shadow: 0 0 20px #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .overlay p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #aaa;
+            max-width: 600px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: transparent;
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: #00ffcc;
+            color: #000;
+            box-shadow: 0 0 30px #00ffcc;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Crosshair */
+        .custom-cursor {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0, 255, 204, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.05s ease-out;
+        }
+
+        .custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #00ffcc;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            background: rgba(0, 255, 204, 0.3);
+            transform: translateX(-50%);
+        }
+
+        .cursor-h-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 255, 204, 0.3);
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="/" class="nav-back">← HUB</a>
+
+    <div class="grid-bg"></div>
+    <div class="vignette"></div>
+
+    <!-- Custom Cursor Element -->
+    <div class="custom-cursor" id="cursor">
+        <div class="cursor-h-line"></div>
+    </div>
+
+    <div class="hud">
+        <div class="hud-panel">
+            <div class="hud-label">Score</div>
+            <div class="hud-value" id="score">0</div>
+        </div>
+        <div class="hud-panel">
+            <div class="hud-label">Accuracy</div>
+            <div class="hud-value" id="accuracy">100%</div>
+        </div>
+        <div class="hud-panel">
+            <div class="hud-label">Time</div>
+            <div class="hud-value" id="time">30.0</div>
+        </div>
+    </div>
+
+    <div class="game-area" id="gameArea"></div>
+
+    <!-- Start Screen -->
+    <div class="overlay" id="startScreen">
+        <h1>Precision Sniper</h1>
+        <p>
+            TRAINING SIMULATION LOADING...<br><br>
+            Eliminate targets as fast as possible.<br>
+            Smaller targets = Higher priority.<br>
+            Missed shots reduce accuracy rating.
+        </p>
+        <button class="btn" onclick="startGame()">INITIATE</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="overlay hidden" id="gameOverScreen">
+        <h1>SIMULATION COMPLETE</h1>
+        <p id="finalStats">
+            Score: 0<br>
+            Accuracy: 0%<br>
+            Targets: 0
+        </p>
+        <button class="btn" onclick="location.reload()">RETRY</button>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('gameArea');
+        const scoreEl = document.ge('score');
+        const timeEl = document.getElementById('time');
+        const accuracyEl = document.getElementById('accuracy');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalStats = document.getElementById('finalStats');
+        const cursor = document.getElementById('cursor');
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let totalClicks = 0;
+        let hits = 0;
+        let spawnInterval;
+        let timerInterval;
+        let targets = [];
+
+        // Custom cursor logic
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        // Audio Context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        funcnd(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'hit') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'miss') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+              udioCtx.currentTime + 0.2);
+            } else if (type === 'spawn') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            }
+        }
+
+        function createTarget() {
+            if (!gameActive) return;
+
+            const target = document.createElement('div');
+            const size = Math.random() * 40 + 30; // 30px to 70px
+            const isGolden = Math.random() < 0.1; //for golden target
+            
+            target.classList.add('target');
+            if arget.classList.add('golden');
+            
+            target.style.width = size + 'px';
+            target.style.height = size + 'px';
+         // Random position (keeping away from edges)
+            const x = Math.random() * (window.innerWidth - 100)   const y = Math.random() * (window.innerHeight - 150) + 100; // Account for HUD
+            
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+             // Data for scoring
+            target.dataset.points = isGolden ? 300 : Math.floor(150 - size); // Smaller = more points
+            target.dataset.id = Date.now();
+
+            // Click handler
+            target.addEventListene', (e) => {
+                e.stopPropagation(); // Prevent game area click (miss)
+                hitTarget(target, e.clientX, e.clientY);
+            });
+
+   Auto-remove after some time
+            const lifeTime = isGolden ? 1500 : 2000;
+            setTimeout(() => {
+        target.parentNode) {
+                    target.remove();
+                    // Optional: penalty for missing a target? For now, no penalty for timeout, just missed opportunity.
+                }
+            }, l           gameArea.appendChild(target);
+            playSound('spawn');
+       function hitTarget(target, x, y) {
+            if (!gameActive) return;
+            
+            hits++;
+            totalClicks++; // Valid click
+            
+            const points = parseInt(target.dataset.points);
+            score += points;
+            sontent = score;
+            
+            // Visual feedback
+            showFloating x, y);
+            createHitMarker(x, y);
+            
+            target.remove();
+            playSound('hit');
+            updateAccuracy();
+
+            // rget immediately on hit to keep flow fast
+            createTarget();
+        }
+
+        function handleMiss(e) {
+            if (!gameActive) return;
+      ore clicks on HUD or buttons
+            if (e.target.closest('.hud') || e.targettn')) return;
+
+            totalClicks++;
+            score = Math.max(0, score - 50); // Penalty
+            scoreEl.textContent = score;
+            
+            showFloatingText("-50", e.clientX, e.clientY, true);
+            playSound('miss');
+            updateAccuracy();
+        }
+
+        function showFloatingText(text, x, y, isNegative = false) {
+            const el = document.createElement('div');
+            el.classList.add('score-float');
+            el.textContent = isNegative ? text : '+' + text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            er = isNegative ? '#ff0055' : (text > 200 ? '#ffd700' : '#fff');
+            gameArea.appendChild(el);
+            setTimeout(() => el.remo        }
+
+        function createHitMarker(x, y) {
+            const el = document.createElement('div');
+            eadd('hit-marker');
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            gameArea.appendChild(el);
+            setTimeout(() => el.remove(), 300);
+        }
+
+        function updateAccuracy() {
+            const acc = totalClicks === 0 ? 100 : Math.round((hits / totalClicks) * 100);
+            accuracyEl.textContent = acc + '%';
+        }
+
+ ion startGame() {
+            startScreen.classList.a;
+            gameActive = true;
+            score = 0;
+            tim            totalClicks = 0;
+            hits = 0;
+            
+            scoreEl.textContent = '0';
+            timeEl.textContent = '30.0';
+            accuracyEl.textContent = '100%';
+            
+            // Clear existing targets
+            gameArea.innerHTML = '';
+            
+            // Global click listener for misses
+            window.addEventListener('mousedown', handleMiss);
+
+            // Spawn loop
+            spawnInterval = setInterval(() => {
+                if (document.querySelectorAll('.target').length < 5) { // Max 5 targ                    createTarget();
+                }
+            }, 400); // Spawn ever         // Initial targets
+            createTarget();
+            createTarget();
+
+            // Timer
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                timeEl.textContent = timeLeft.toFixed(1);
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 100);
+        }
+
+        function endGame() {
+            gameActiv           clearInterval(spawnInterval);
+        erval(timerInterval);
+            window.remvener('mousedown', handleMiss);
+            
+            const acc = totalClicks === 0 ? 0 : Math.round((hits / totalClicks) * 100);
+            
+            finalStats.innerHTML = `
+                SCORE: <span style="color:#00ffcc">${score}</span><br>
+                ACCURACY: <span style="color:#00ffcc">${acc}%</span><br>
+                TARGETS HIT: <span style="color:#00ffcc">${hits}</span>
+            `;
+            
+            gameOverScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>

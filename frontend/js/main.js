@@ -116,6 +116,13 @@ async function loadGames() {
             desc: 'Clicca appena il cerchio diventa rosso.',
             img: './assets/reaction.png',
             page: '/games/reaction-test.html'
+        },
+        {
+            id: 'precision-sniper',
+            name: 'Precision Sniper',
+            desc: 'Colpisci i bersagli velocemente. Precisione conta!',
+            img: 'https://placehold.co/80x80?text=Sniper',
+            page: '/games/precision-sniper.html'
         }
     ];
 
