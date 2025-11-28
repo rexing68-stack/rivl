@@ -101,14 +101,14 @@ async function loadGames() {
             name: 'Tiro alla fune',
             desc: 'Premi il pulsante il più velocemente possibile per 5 secondi!',
             img: './assets/tug.png',
-            page: './games/tug-of-war.html'
+            page: '/games/tug-of-war.html'
         },
         {
             id: 'reaction-test',
             name: 'Reaction Test',
             desc: 'Clicca appena il cerchio diventa rosso.',
             img: './assets/reaction.png',
-            page: './games/reaction-test.html'
+            page: '/games/reaction-test.html'
         }
     ];
 

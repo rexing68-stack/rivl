@@ -14,5 +14,12 @@ export default defineConfig({
     build: {
         outDir: '../dist',
         emptyOutDir: true,
+        rollupOptions: {
+            input: {
+                main: 'frontend/index.html',
+                tug: 'frontend/games/tug-of-war.html',
+                reaction: 'frontend/games/reaction-test.html'
+            }
+        }
     },
 });
