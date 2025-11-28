@@ -8,10 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-green: #00ff41;
-            --neon-purple: #b400ff;
-            --neon-red: #ff0055;
-            --neon-blue: #00f3ff;
+            --player-color: #00ff41;
+            --enemy-color: #ff0055;
         }
 
         * {
@@ -21,7 +19,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0a0014 0%, #1a0a2e 100%);
+            background: #0a0a0a;
             color: white;
             font-family: 'Orbitron', sans-serif;
             overflow: hidden;
@@ -40,7 +38,7 @@
             z-index: 100;
         }
 
-        /* Arena */
+        /* Battle Arena */
         .arena {
             position: relative;
             width: 100%;
@@ -48,188 +46,321 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background:
-                radial-gradient(circle at 30% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 50%, rgba(255, 0, 85, 0.1) 0%, transparent 50%);
+            background: linear-gradient(180deg, #1a1a2e 0%, #0a0a0a 100%);
+            transition: transform 1s, filter 1s;
         }
 
-        /* Grid floor effect */
-        .arena::before {
-            content: '';
+        .arena.ko-cam {
+            transform: scale(1.5);
+            filter: contrast(1.5) saturate(2);
+        }
+
+        /* Floor */
+        .floor {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 50%;
-            background:
-                linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent),
-                linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
-            background-size: 50px 50px;
-            opacity: 0.3;
-            perspective: 500px;
-            transform: rotateX(60deg);
+            height: 200px;
+            background: linear-gradient(180deg, transparent, rgba(100, 100, 100, 0.2));
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Characters */
-        .character {
+        /* Soldiers */
+        .soldier {
             position: absolute;
-            width: 120px;
-            height: 120px;
-            font-size: 80px;
+            bottom: 200px;
+            width: 100px;
+            transition: all 0.3s;
+        }
+
+        .player-soldier {
+            left: 25%;
+            transform: scaleX(1);
+        }
+
+        .enemy-soldier {
+            right: 25%;
+            transform: scaleX(-1);
+        }
+
+        /* Soldier body parts */
+        .soldier-body {
+            position: relative;
+            width: 100px;
+            height: 150px;
+        }
+
+        .head {
+            width: 40px;
+            height: 40px;
+            background: #ddd;
+            border-radius: 5px;
+            margin: 0 auto 5px;
+            position: relative;
+        }
+
+        .helmet {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            height: 25px;
+            background: var(--soldier-color);
+            border-radius: 5px 5px 0 0;
+        }
+
+        .player-soldier .helmet {
+            background: var(--player-color);
+        }
+
+        .enemy-soldier .helmet {
+            background: var(--enemy-color);
+        }
+
+        .visor {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            height: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 2px;
+        }
+
+        .torso {
+            width: 50px;
+            height: 60px;
+            background: #888;
+            margin: 0 auto;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .armor {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background: var(--soldier-color);
+            border-radius: 3px;
+        }
+
+        .player-soldier .armor {
+            background: linear-gradient(180deg, var(--player-color), #00aa2e);
+        }
+
+        .enemy-soldier .armor {
+            background: linear-gradient(180deg, var(--enemy-color), #aa0033);
+        }
+
+        .arm {
+            position: absolute;
+            width: 15px;
+            height: 50px;
+            background: #888;
+            border-radius: 3px;
+            top: 10px;
+        }
+
+        .arm-left {
+            left: -12px;
+        }
+
+        .arm-right {
+            right: -12px;
+        }
+
+        .weapon {
+            position: absolute;
+            width: 8px;
+            height: 30px;
+            background: #333;
+            bottom: -25px;
+            left: 3px;
+            border-radius: 2px;
+        }
+
+        .legs {
             display: flex;
-            align-items: center;
             justify-content: center;
-            filter: drop-shadow(0 0 20px currentColor);
-            transition: transform 0.1s;
+            gap: 10px;
+            margin-top: 5px;
         }
 
-        .player-char {
-            left: 20%;
-            color: var(--neon-green);
-            animation: idle 2s ease-in-out infinite;
+        .leg {
+            width: 18px;
+            height: 40px;
+            background: #666;
+            border-radius: 3px;
         }
 
-        .bot-char {
-            right: 20%;
-            color: var(--neon-red);
-            animation: idle 2s ease-in-out infinite reverse;
-        }
-
-        @keyframes idle {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .character.attacking {
-            animation: attack 0.3s;
+        /* Attack animation */
+        .soldier.attacking {
+            animation: attack 0.2s;
         }
 
         @keyframes attack {
-            0% {
-                transform: scale(1) translateX(0);
+
+            0%,
+            100% {
+                transform: translateX(0) scaleX(1);
             }
 
             50% {
-                transform: scale(1.3) translateX(30px);
+                transform: translateX(20px) scaleX(1);
             }
+        }
 
+        .enemy-soldier.attacking {
+            animation: attackEnemy 0.2s;
+        }
+
+        @keyframes attackEnemy {
+
+            0%,
             100% {
-                transform: scale(1) translateX(0);
-            }
-        }
-
-        .bot-char.attacking {
-            animation: attackLeft 0.3s;
-        }
-
-        @keyframes attackLeft {
-            0% {
-                transform: scale(1) translateX(0);
+                transform: translateX(0) scaleX(-1);
             }
 
             50% {
-                transform: scale(1.3) translateX(-30px);
+                transform: translateX(-20px) scaleX(-1);
             }
+        }
 
+        /* Hit effect */
+        .soldier.hit {
+            animation: hitFlash 0.3s;
+        }
+
+        @keyframes hitFlash {
+
+            0%,
             100% {
-                transform: scale(1) translateX(0);
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(2) hue-rotate(180deg);
             }
         }
 
-        /* Energy blast effect */
-        .blast {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: blastFly 0.5s forwards;
+        /* KO animation */
+        .soldier.ko {
+            animation: knockout 1s forwards;
         }
 
-        .player-blast {
-            background: radial-gradient(circle, var(--neon-green), transparent);
-            box-shadow: 0 0 20px var(--neon-green);
-            left: 25%;
-            top: 50%;
-        }
-
-        .bot-blast {
-            background: radial-gradient(circle, var(--neon-red), transparent);
-            box-shadow: 0 0 20px var(--neon-red);
-            right: 25%;
-            top: 50%;
-        }
-
-        @keyframes blastFly {
+        @keyframes knockout {
             0% {
-                transform: translateX(0) scale(1);
+                transform: rotate(0deg) translateY(0);
                 opacity: 1;
             }
 
+            50% {
+                transform: rotate(180deg) translateY(-50px);
+            }
+
             100% {
-                transform: translateX(200px) scale(0.5);
+                transform: rotate(360deg) translateY(100px);
                 opacity: 0;
             }
+        }
+
+        /* Muzzle flash */
+        .muzzle-flash {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, yellow, orange, transparent);
+            border-radius: 50%;
+            bottom: 80px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .player-soldier .muzzle-flash {
+            left: 80px;
+        }
+
+        .enemy-soldier .muzzle-flash {
+            right: 80px;
+        }
+
+        .muzzle-flash.flash {
+            animation: flashAnim 0.1s;
+        }
+
+        @keyframes flashAnim {
+
+            0%,
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Health bars */
+        .health-bar-container {
+            position: absolute;
+            top: -30px;
+            width: 120px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .health-bar {
+            height: 100%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .player-health {
+            background: var(--player-color);
+        }
+
+        .enemy-health {
+            background: var(--enemy-color);
         }
 
         /* HUD */
         .hud {
             position: absolute;
-            top: 0;
+            top: 30px;
             width: 100%;
-            padding: 30px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            padding: 0 50px;
             z-index: 10;
         }
 
-        .player-hud,
-        .bot-hud {
-            background: rgba(0, 0, 0, 0.7);
+        .score-display {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 30px;
+            border-radius: 10px;
             border: 2px solid;
-            border-radius: 15px;
-            padding: 20px;
-            min-width: 200px;
-            backdrop-filter: blur(10px);
-        }
-
-        .player-hud {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-        }
-
-        .bot-hud {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
-        }
-
-        .hud-label {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .hud-score {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: bold;
             text-shadow: 0 0 10px currentColor;
         }
 
-        .player-hud .hud-score {
-            color: var(--neon-green);
+        .player-score-display {
+            border-color: var(--player-color);
+            color: var(--player-color);
         }
 
-        .bot-hud .hud-score {
-            color: var(--neon-red);
+        .enemy-score-display {
+            border-color: var(--enemy-color);
+            color: var(--enemy-color);
         }
 
         /* Timer */
@@ -238,52 +369,42 @@
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            border: 3px solid var(--neon-purple);
-            border-radius: 20px;
-            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #b400ff;
+            border-radius: 15px;
+            padding: 15px 40px;
             font-size: 3rem;
             font-weight: bold;
-            color: var(--neon-purple);
-            text-shadow: 0 0 20px var(--neon-purple);
-            box-shadow: 0 0 30px rgba(180, 0, 255, 0.5);
+            color: #b400ff;
+            text-shadow: 0 0 20px #b400ff;
             z-index: 10;
         }
 
         /* Click button */
-        .click-zone {
+        .click-button {
             position: absolute;
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 20;
-        }
-
-        .click-button {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            border: 4px solid var(--neon-purple);
-            background: radial-gradient(circle, rgba(180, 0, 255, 0.3), rgba(180, 0, 255, 0.05));
+            border: 4px solid #b400ff;
+            background: radial-gradient(circle, rgba(180, 0, 255, 0.3), transparent);
             color: white;
             font-size: 1.5rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.1s;
             box-shadow: 0 0 40px rgba(180, 0, 255, 0.5);
+            z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
         }
 
-        .click-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 60px rgba(180, 0, 255, 0.8);
-        }
-
         .click-button:active {
-            transform: scale(0.95);
+            transform: translateX(-50%) scale(0.9);
         }
 
         .click-button.pulsing {
@@ -294,21 +415,15 @@
 
             0%,
             100% {
-                transform: scale(1);
+                box-shadow: 0 0 40px rgba(180, 0, 255, 0.5);
             }
 
             50% {
-                transform: scale(1.1);
+                box-shadow: 0 0 60px rgba(180, 0, 255, 1);
             }
         }
 
-        .instructions {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        /* Result modal */
+        /* Result */
         .result {
             position: absolute;
             top: 50%;
@@ -317,8 +432,7 @@
             background: rgba(0, 0, 0, 0.95);
             padding: 50px 70px;
             border-radius: 20px;
-            border: 4px solid var(--neon-green);
-            box-shadow: 0 0 60px rgba(0, 255, 65, 0.7);
+            border: 4px solid;
             display: none;
             z-index: 100;
             text-align: center;
@@ -326,18 +440,23 @@
 
         .result.show {
             display: block;
-            animation: fadeIn 0.3s;
+            animation: fadeIn 0.5s;
+        }
+
+        .result.victory {
+            border-color: var(--player-color);
+            box-shadow: 0 0 60px var(--player-color);
         }
 
         .result.defeat {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 60px rgba(255, 0, 85, 0.7);
+            border-color: var(--enemy-color);
+            box-shadow: 0 0 60px var(--enemy-color);
         }
 
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
+                transform: translate(-50%, -50%) scale(0.5);
             }
 
             to {
@@ -347,51 +466,28 @@
         }
 
         .result h2 {
-            font-size: 3rem;
+            font-size: 4rem;
             margin-bottom: 30px;
+            text-shadow: 0 0 20px currentColor;
         }
 
-        .result h2.victory {
-            color: var(--neon-green);
-            text-shadow: 0 0 20px var(--neon-green);
+        .result.victory h2 {
+            color: var(--player-color);
         }
 
-        .result h2.defeat-text {
-            color: var(--neon-red);
-            text-shadow: 0 0 20px var(--neon-red);
+        .result.defeat h2 {
+            color: var(--enemy-color);
         }
 
-        .score-comparison {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
+        .final-stats {
             font-size: 1.5rem;
-        }
-
-        .player-final {
-            color: var(--neon-green);
-        }
-
-        .bot-final {
-            color: var(--neon-red);
-        }
-
-        .final-score {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .verdict {
-            font-size: 1.3rem;
             margin: 20px 0;
-            opacity: 0.9;
         }
 
         .restart-btn {
             margin-top: 30px;
             padding: 15px 50px;
-            background: var(--neon-purple);
+            background: #b400ff;
             border: none;
             border-radius: 10px;
             color: white;
@@ -399,31 +495,11 @@
             font-weight: bold;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
-            box-shadow: 0 0 20px var(--neon-purple);
         }
 
         .restart-btn:hover {
-            background: var(--neon-green);
+            background: var(--player-color);
             color: black;
-        }
-
-        @media (max-width: 768px) {
-            .character {
-                width: 80px;
-                height: 80px;
-                font-size: 50px;
-            }
-
-            .click-button {
-                width: 150px;
-                height: 150px;
-                font-size: 1.2rem;
-            }
-
-            .hud {
-                flex-direction: column;
-                gap: 10px;
-            }
         }
     </style>
 </head>
@@ -433,126 +509,177 @@
     <a href="/" class="nav-back">← BACK TO HUB</a>
 
     <div class="arena" id="arena">
-        <!-- Characters -->
-        <div class="character player-char" id="playerChar">🤖</div>
-        <div class="character bot-char" id="botChar">👾</div>
+        <div class="floor"></div>
+
+        <!-- Player Soldier -->
+        <div class="soldier player-soldier" id="playerSoldier">
+            <div class="health-bar-container">
+                <div class="health-bar player-health" id="playerHealth" style="width: 100%;"></div>
+            </div>
+            <div class="soldier-body">
+                <div class="head">
+                    <div class="helmet"></div>
+                    <div class="visor"></div>
+                </div>
+                <div class="torso">
+                    <div class="armor"></div>
+                    <div class="arm arm-left"></div>
+                    <div class="arm arm-right">
+                        <div class="weapon"></div>
+                    </div>
+                </div>
+                <div class="legs">
+                    <div class="leg"></div>
+                    <div class="leg"></div>
+                </div>
+            </div>
+            <div class="muzzle-flash" id="playerFlash"></div>
+        </div>
+
+        <!-- Enemy Soldier -->
+        <div class="soldier enemy-soldier" id="enemySoldier">
+            <div class="health-bar-container">
+                <div class="health-bar enemy-health" id="enemyHealth" style="width: 100%;"></div>
+            </div>
+            <div class="soldier-body">
+                <div class="head">
+                    <div class="helmet"></div>
+                    <div class="visor"></div>
+                </div>
+                <div class="torso">
+                    <div class="armor"></div>
+                    <div class="arm arm-left"></div>
+                    <div class="arm arm-right">
+                        <div class="weapon"></div>
+                    </div>
+                </div>
+                <div class="legs">
+                    <div class="leg"></div>
+                    <div class="leg"></div>
+                </div>
+            </div>
+            <div class="muzzle-flash" id="enemyFlash"></div>
+        </div>
 
         <!-- HUD -->
         <div class="hud">
-            <div class="player-hud">
-                <div class="hud-label">You</div>
-                <div class="hud-score" id="playerScore">0</div>
-            </div>
-            <div class="bot-hud">
-                <div class="hud-label">Rival Bot</div>
-                <div class="hud-score" id="botScore">0</div>
-            </div>
+            <div class="score-display player-score-display" id="playerScore">0</div>
+            <div class="score-display enemy-score-display" id="enemyScore">0</div>
         </div>
 
         <!-- Timer -->
         <div class="timer" id="timer">10</div>
 
         <!-- Click button -->
-        <div class="click-zone">
-            <button class="click-button pulsing" id="clickBtn">
-                <div>ATTACK!</div>
-                <div class="instructions">Click to fight</div>
-            </button>
-        </div>
+        <button class="click-button pulsing" id="clickBtn">
+            <div>FIRE!</div>
+            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">Click to shoot</div>
+        </button>
     </div>
 
-    <!-- Result modal -->
+    <!-- Result -->
     <div class="result" id="result">
         <h2 id="resultTitle">BATTLE OVER!</h2>
-        <div class="score-comparison">
-            <div class="player-final">
-                <div>YOU</div>
-                <div class="final-score" id="finalPlayerScore">0</div>
-            </div>
-            <div style="font-size: 3rem; opacity: 0.5;">⚔️</div>
-            <div class="bot-final">
-                <div>BOT</div>
-                <div class="final-score" id="finalBotScore">0</div>
-            </div>
-        </div>
-        <p class="verdict" id="verdict"></p>
+        <div class="final-stats" id="finalStats"></div>
         <button class="restart-btn" onclick="location.reload()">REMATCH</button>
     </div>
 
     <script>
-        let playerClicks = 0;
-        let botClicks = 0;
+        let playerHits = 0;
+        let enemyHits = 0;
+        let playerHealth = 100;
+        let enemyHealth = 100;
         let timeLeft = 10;
         let gameActive = false;
         let gameStarted = false;
-        let interval;
 
         const arena = document.getElementById('arena');
-        const playerChar = document.getElementById('playerChar');
-        const botChar = document.getElementById('botChar');
-        const clickBtn = document.getElementById('clickBtn');
-        const timerEl = document.getElementById('timer');
+        const playerSoldier = document.getElementById('playerSoldier');
+        const enemySoldier = document.getElementById('enemySoldier');
+        const playerHealthBar = document.getElementById('playerHealth');
+        const enemyHealthBar = document.getElementById('enemyHealth');
         const playerScoreEl = document.getElementById('playerScore');
-        const botScoreEl = document.getElementById('botScore');
+        const enemyScoreEl = document.getElementById('enemyScore');
+        const timerEl = document.getElementById('timer');
+        const clickBtn = document.getElementById('clickBtn');
+        const playerFlash = document.getElementById('playerFlash');
+        const enemyFlash = document.getElementById('enemyFlash');
         const resultEl = document.getElementById('result');
         const resultTitle = document.getElementById('resultTitle');
-        const finalPlayerScoreEl = document.getElementById('finalPlayerScore');
-        const finalBotScoreEl = document.getElementById('finalBotScore');
-        const verdictEl = document.getElementById('verdict');
+        const finalStats = document.getElementById('finalStats');
 
-        // Audio
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playSound(freq) {
+        function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            if (type === 'shoot') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            }
+
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        function createBlast(isPlayer) {
-            const blast = document.createElement('div');
-            blast.classList.add('blast');
-            blast.classList.add(isPlayer ? 'player-blast' : 'bot-blast');
-            arena.appendChild(blast);
-            setTimeout(() => blast.remove(), 500);
+        function playerShoot() {
+            playerSoldier.classList.add('attacking');
+            playerFlash.classList.add('flash');
+            setTimeout(() => {
+                playerSoldier.classList.remove('attacking');
+                playerFlash.classList.remove('flash');
+            }, 200);
+
+            enemySoldier.classList.add('hit');
+            setTimeout(() => enemySoldier.classList.remove('hit'), 300);
+
+            enemyHealth = Math.max(0, enemyHealth - (100 / 10));
+            enemyHealthBar.style.width = enemyHealth + '%';
+
+            playSound('shoot');
+            setTimeout(() => playSound('hit'), 100);
         }
 
-        function playerAttack() {
-            playerChar.classList.add('attacking');
-            setTimeout(() => playerChar.classList.remove('attacking'), 300);
-            createBlast(true);
-            playSound(600 + playerClicks * 20);
+        function enemyShoot() {
+            enemySoldier.classList.add('attacking');
+            enemyFlash.classList.add('flash');
+            setTimeout(() => {
+                enemySoldier.classList.remove('attacking');
+                enemyFlash.classList.remove('flash');
+            }, 200);
+
+            playerSoldier.classList.add('hit');
+            setTimeout(() => playerSoldier.classList.remove('hit'), 300);
+
+            playerHealth = Math.max(0, playerHealth - (100 / 10));
+            playerHealthBar.style.width = playerHealth + '%';
+
+            playSound('shoot');
+            setTimeout(() => playSound('hit'), 100);
         }
 
-        function botAttack() {
-            botChar.classList.add('attacking');
-            setTimeout(() => botChar.classList.remove('attacking'), 300);
-            createBlast(false);
-            playSound(400);
-        }
-
-        function botClick() {
+        function enemyAI() {
             if (!gameActive) return;
 
-            const randomDelay = 140 + Math.random() * 110;
-
+            const delay = 140 + Math.random() * 110;
             setTimeout(() => {
-                if (gameActive) {
-                    botClicks++;
-                    botScoreEl.textContent = botClicks;
-                    botAttack();
-                    botClick();
+                if (gameActive && enemyHealth > 0) {
+                    enemyHits++;
+                    enemyScoreEl.textContent = enemyHits;
+                    enemyShoot();
+                    enemyAI();
                 }
-            }, randomDelay);
+            }, delay);
         }
 
         function startGame() {
@@ -560,67 +687,70 @@
             gameStarted = true;
             gameActive = true;
             clickBtn.classList.remove('pulsing');
-            clickBtn.querySelector('.instructions').textContent = 'Keep clicking!';
 
-            botClick();
+            enemyAI();
 
-            interval = setInterval(() => {
+            const interval = setInterval(() => {
                 timeLeft--;
                 timerEl.textContent = timeLeft;
 
                 if (timeLeft <= 3) {
-                    timerEl.style.color = 'var(--neon-red)';
-                    timerEl.style.animation = 'pulse 0.5s infinite';
+                    timerEl.style.color = '#ff0055';
                 }
 
-                if (timeLeft <= 0) {
+                if (timeLeft <= 0 || playerHealth <= 0 || enemyHealth <= 0) {
+                    clearInterval(interval);
                     endGame();
                 }
             }, 1000);
         }
 
         function endGame() {
-            clearInterval(interval);
             gameActive = false;
             clickBtn.disabled = true;
-            clickBtn.style.opacity = '0.3';
+            clickBtn.style.opacity = '0';
 
-            finalPlayerScoreEl.textContent = playerClicks;
-            finalBotScoreEl.textContent = botClicks;
+            // KO animation
+            setTimeout(() => {
+                arena.classList.add('ko-cam');
 
-            if (playerClicks > botClicks) {
-                resultTitle.textContent = 'VICTORY!';
-                resultTitle.classList.add('victory');
-                const diff = playerClicks - botClicks;
-                verdictEl.textContent = `You dominated with ${diff} more attack${diff > 1 ? 's' : ''}! 🏆`;
-            } else if (playerClicks < botClicks) {
-                resultTitle.textContent = 'DEFEAT!';
-                resultTitle.classList.add('defeat-text');
-                resultEl.classList.add('defeat');
-                const diff = botClicks - playerClicks;
-                verdictEl.textContent = `The bot overwhelmed you by ${diff} attack${diff > 1 ? 's' : ''}! Train harder! 💪`;
-            } else {
-                resultTitle.textContent = 'DRAW!';
-                resultTitle.classList.add('victory');
-                verdictEl.textContent = 'Perfect balance! Both warriors are equally matched! ⚖️';
-            }
+                if (playerHits > enemyHits || enemyHealth <= 0) {
+                    enemySoldier.classList.add('ko');
+                } else {
+                    playerSoldier.classList.add('ko');
+                }
 
-            resultEl.classList.add('show');
+                setTimeout(() => {
+                    if (playerHits > enemyHits || enemyHealth <= 0) {
+                        resultTitle.textContent = 'VICTORY!';
+                        resultEl.classList.add('victory');
+                        finalStats.innerHTML = `You eliminated the enemy!<br>Hits: ${playerHits} vs ${enemyHits}`;
+                    } else if (playerHits < enemyHits || playerHealth <= 0) {
+                        resultTitle.textContent = 'K.O.!';
+                        resultEl.classList.add('defeat');
+                        finalStats.innerHTML = `You were eliminated!<br>Hits: ${playerHits} vs ${enemyHits}`;
+                    } else {
+                        resultTitle.textContent = 'DRAW!';
+                        resultEl.classList.add('victory');
+                        finalStats.innerHTML = `Both soldiers standing!<br>Hits: ${playerHits} vs ${enemyHits}`;
+                    }
+
+                    resultEl.classList.add('show');
+                }, 1000);
+            }, 500);
         }
 
-        clickBtn.addEventListener('click', (e) => {
+        clickBtn.addEventListener('click', () => {
             if (!gameActive && !gameStarted) {
                 startGame();
             }
 
-            if (!gameActive) return;
+            if (!gameActive || playerHealth <= 0) return;
 
-            playerClicks++;
-            playerScoreEl.textContent = playerClicks;
-            playerAttack();
+            playerHits++;
+            playerScoreEl.textContent = playerHits;
+            playerShoot();
         });
-
-        clickBtn.addEventListener('mousedown', (e) => e.preventDefault());
     </script>
 </body>
 
