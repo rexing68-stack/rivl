@@ -11,20 +11,20 @@
             --neon-green: #00ff41;
             --neon-purple: #b400ff;
             --neon-red: #ff0055;
-            --bg-dark: #050505;
+            --neon-blue: #00f3ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+            background: linear-gradient(135deg, #0a0014 0%, #1a0a2e 100%);
             color: white;
             font-family: 'Orbitron', sans-serif;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             height: 100vh;
             user-select: none;
         }
@@ -37,131 +37,244 @@
             text-decoration: none;
             font-size: 0.8rem;
             opacity: 0.7;
-            z-index: 20;
+            z-index: 100;
         }
 
-        .game-container {
-            text-align: center;
+        /* Arena */
+        .arena {
             position: relative;
-            width: 90%;
-            max-width: 800px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin: 0 0 20px 0;
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-purple));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
-        }
-
-        /* Battle Bar */
-        .battle-bar {
             width: 100%;
-            height: 80px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 40px;
-            border: 2px solid #333;
-            position: relative;
-            overflow: hidden;
-            margin: 20px 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 30% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(255, 0, 85, 0.1) 0%, transparent 50%);
         }
 
-        .player-bar {
+        /* Grid floor effect */
+        .arena::before {
+            content: '';
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-green), rgba(0, 255, 65, 0.5));
-            transition: width 0.2s;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background:
+                linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0.05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            perspective: 500px;
+            transform: rotateX(60deg);
+        }
+
+        /* Characters */
+        .character {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            font-size: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 0 20px currentColor);
+            transition: transform 0.1s;
+        }
+
+        .player-char {
+            left: 20%;
+            color: var(--neon-green);
+            animation: idle 2s ease-in-out infinite;
+        }
+
+        .bot-char {
+            right: 20%;
+            color: var(--neon-red);
+            animation: idle 2s ease-in-out infinite reverse;
+        }
+
+        @keyframes idle {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .character.attacking {
+            animation: attack 0.3s;
+        }
+
+        @keyframes attack {
+            0% {
+                transform: scale(1) translateX(0);
+            }
+
+            50% {
+                transform: scale(1.3) translateX(30px);
+            }
+
+            100% {
+                transform: scale(1) translateX(0);
+            }
+        }
+
+        .bot-char.attacking {
+            animation: attackLeft 0.3s;
+        }
+
+        @keyframes attackLeft {
+            0% {
+                transform: scale(1) translateX(0);
+            }
+
+            50% {
+                transform: scale(1.3) translateX(-30px);
+            }
+
+            100% {
+                transform: scale(1) translateX(0);
+            }
+        }
+
+        /* Energy blast effect */
+        .blast {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: blastFly 0.5s forwards;
+        }
+
+        .player-blast {
+            background: radial-gradient(circle, var(--neon-green), transparent);
             box-shadow: 0 0 20px var(--neon-green);
+            left: 25%;
+            top: 50%;
         }
 
-        .bot-bar {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            background: linear-gradient(-90deg, var(--neon-red), rgba(255, 0, 85, 0.5));
-            transition: width 0.2s;
+        .bot-blast {
+            background: radial-gradient(circle, var(--neon-red), transparent);
             box-shadow: 0 0 20px var(--neon-red);
+            right: 25%;
+            top: 50%;
         }
 
-        .battle-labels {
+        @keyframes blastFly {
+            0% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(200px) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* HUD */
+        .hud {
             position: absolute;
+            top: 0;
             width: 100%;
-            height: 100%;
+            padding: 30px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            box-sizing: border-box;
+            align-items: flex-start;
             z-index: 10;
         }
 
-        .player-label,
-        .bot-label {
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px black;
+        .player-hud,
+        .bot-hud {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid;
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
         }
 
-        .player-label {
-            color: var(--neon-green);
-        }
-
-        .bot-label {
-            color: var(--neon-red);
-        }
-
-        .stats {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            margin: 30px 0;
-        }
-
-        .stat-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--neon-green);
-            border-radius: 10px;
-            padding: 20px 40px;
+        .player-hud {
+            border-color: var(--neon-green);
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
 
-        .stat-label {
+        .bot-hud {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+        }
+
+        .hud-label {
             font-size: 0.8rem;
             opacity: 0.7;
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin-bottom: 10px;
         }
 
-        .stat-value {
+        .hud-score {
             font-size: 3rem;
             font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .player-hud .hud-score {
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .bot-hud .hud-score {
+            color: var(--neon-red);
+        }
+
+        /* Timer */
+        .timer {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid var(--neon-purple);
+            border-radius: 20px;
+            padding: 20px 40px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--neon-purple);
+            text-shadow: 0 0 20px var(--neon-purple);
+            box-shadow: 0 0 30px rgba(180, 0, 255, 0.5);
+            z-index: 10;
+        }
+
+        /* Click button */
+        .click-zone {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
         }
 
         .click-button {
-            width: 250px;
-            height: 250px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             border: 4px solid var(--neon-purple);
-            background: radial-gradient(circle, rgba(180, 0, 255, 0.2), rgba(180, 0, 255, 0.05));
+            background: radial-gradient(circle, rgba(180, 0, 255, 0.3), rgba(180, 0, 255, 0.05));
             color: white;
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.1s;
             box-shadow: 0 0 40px rgba(180, 0, 255, 0.5);
-            margin: 30px auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            flex-direction: column;
         }
 
         .click-button:hover {
@@ -171,7 +284,6 @@
 
         .click-button:active {
             transform: scale(0.95);
-            box-shadow: 0 0 80px rgba(180, 0, 255, 1);
         }
 
         .click-button.pulsing {
@@ -191,23 +303,25 @@
         }
 
         .instructions {
-            font-size: 1.2rem;
-            opacity: 0.8;
-            margin-top: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
 
+        /* Result modal */
         .result {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.95);
-            padding: 40px 60px;
+            padding: 50px 70px;
             border-radius: 20px;
-            border: 3px solid var(--neon-green);
-            box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);
+            border: 4px solid var(--neon-green);
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.7);
             display: none;
             z-index: 100;
+            text-align: center;
         }
 
         .result.show {
@@ -217,7 +331,7 @@
 
         .result.defeat {
             border-color: var(--neon-red);
-            box-shadow: 0 0 50px rgba(255, 0, 85, 0.5);
+            box-shadow: 0 0 60px rgba(255, 0, 85, 0.7);
         }
 
         @keyframes fadeIn {
@@ -233,88 +347,82 @@
         }
 
         .result h2 {
-            font-size: 2.5rem;
-            margin: 0 0 20px 0;
+            font-size: 3rem;
+            margin-bottom: 30px;
         }
 
         .result h2.victory {
             color: var(--neon-green);
+            text-shadow: 0 0 20px var(--neon-green);
         }
 
         .result h2.defeat-text {
             color: var(--neon-red);
-        }
-
-        .result p {
-            font-size: 1.2rem;
-            margin: 10px 0;
+            text-shadow: 0 0 20px var(--neon-red);
         }
 
         .score-comparison {
             display: flex;
             justify-content: space-around;
-            margin: 20px 0;
+            margin: 30px 0;
             font-size: 1.5rem;
         }
 
-        .player-score-final {
+        .player-final {
             color: var(--neon-green);
         }
 
-        .bot-score-final {
+        .bot-final {
             color: var(--neon-red);
+        }
+
+        .final-score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .verdict {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            opacity: 0.9;
         }
 
         .restart-btn {
             margin-top: 30px;
-            padding: 15px 40px;
-            background: var(--neon-green);
+            padding: 15px 50px;
+            background: var(--neon-purple);
             border: none;
             border-radius: 10px;
-            color: black;
-            font-size: 1.2rem;
+            color: white;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 0 20px var(--neon-purple);
         }
 
         .restart-btn:hover {
-            background: var(--neon-purple);
-            color: white;
+            background: var(--neon-green);
+            color: black;
         }
 
-        /* Click effect particles */
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-green);
-            animation: float 0.5s forwards;
-        }
-
-        @keyframes float {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
+        @media (max-width: 768px) {
+            .character {
+                width: 80px;
+                height: 80px;
+                font-size: 50px;
             }
 
-            100% {
-                opacity: 0;
-                transform: translateY(-50px) scale(1.5);
-            }
-        }
-
-        @media (max-width: 700px) {
             .click-button {
-                width: 180px;
-                height: 180px;
-                font-size: 1.5rem;
+                width: 150px;
+                height: 150px;
+                font-size: 1.2rem;
             }
 
-            .stats {
+            .hud {
                 flex-direction: column;
-                gap: 20px;
+                gap: 10px;
             }
         }
     </style>
@@ -324,49 +432,51 @@
 
     <a href="/" class="nav-back">← BACK TO HUB</a>
 
-    <div class="game-container">
-        <h1>CLICK FRENZY</h1>
+    <div class="arena" id="arena">
+        <!-- Characters -->
+        <div class="character player-char" id="playerChar">🤖</div>
+        <div class="character bot-char" id="botChar">👾</div>
 
-        <div class="battle-bar">
-            <div class="player-bar" id="playerBar"></div>
-            <div class="bot-bar" id="botBar"></div>
-            <div class="battle-labels">
-                <span class="player-label">YOU: <span id="playerScore">0</span></span>
-                <span class="bot-label">BOT: <span id="botScore">0</span></span>
+        <!-- HUD -->
+        <div class="hud">
+            <div class="player-hud">
+                <div class="hud-label">You</div>
+                <div class="hud-score" id="playerScore">0</div>
+            </div>
+            <div class="bot-hud">
+                <div class="hud-label">Rival Bot</div>
+                <div class="hud-score" id="botScore">0</div>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-label">Time Left</div>
-                <div class="stat-value" id="timeLeft">10</div>
-            </div>
-        </div>
+        <!-- Timer -->
+        <div class="timer" id="timer">10</div>
 
-        <button class="click-button pulsing" id="clickBtn">
-            CLICK ME!
-        </button>
-
-        <div class="instructions">
-            Click faster than the bot for 10 seconds!
+        <!-- Click button -->
+        <div class="click-zone">
+            <button class="click-button pulsing" id="clickBtn">
+                <div>ATTACK!</div>
+                <div class="instructions">Click to fight</div>
+            </button>
         </div>
     </div>
 
+    <!-- Result modal -->
     <div class="result" id="result">
-        <h2 id="resultTitle">TIME'S UP!</h2>
+        <h2 id="resultTitle">BATTLE OVER!</h2>
         <div class="score-comparison">
-            <div>
+            <div class="player-final">
                 <div>YOU</div>
-                <div class="player-score-final" id="finalPlayerScore">0</div>
+                <div class="final-score" id="finalPlayerScore">0</div>
             </div>
-            <div style="font-size: 3rem; opacity: 0.5;">VS</div>
-            <div>
+            <div style="font-size: 3rem; opacity: 0.5;">⚔️</div>
+            <div class="bot-final">
                 <div>BOT</div>
-                <div class="bot-score-final" id="finalBotScore">0</div>
+                <div class="final-score" id="finalBotScore">0</div>
             </div>
         </div>
-        <p id="verdict"></p>
-        <button class="restart-btn" onclick="location.reload()">PLAY AGAIN</button>
+        <p class="verdict" id="verdict"></p>
+        <button class="restart-btn" onclick="location.reload()">REMATCH</button>
     </div>
 
     <script>
@@ -376,14 +486,14 @@
         let gameActive = false;
         let gameStarted = false;
         let interval;
-        let botInterval;
 
+        const arena = document.getElementById('arena');
+        const playerChar = document.getElementById('playerChar');
+        const botChar = document.getElementById('botChar');
         const clickBtn = document.getElementById('clickBtn');
-        const timeLeftEl = document.getElementById('timeLeft');
+        const timerEl = document.getElementById('timer');
         const playerScoreEl = document.getElementById('playerScore');
         const botScoreEl = document.getElementById('botScore');
-        const playerBar = document.getElementById('playerBar');
-        const botBar = document.getElementById('botBar');
         const resultEl = document.getElementById('result');
         const resultTitle = document.getElementById('resultTitle');
         const finalPlayerScoreEl = document.getElementById('finalPlayerScore');
@@ -393,42 +503,54 @@
         // Audio
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playClickSound() {
+        function playSound(freq) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800 + (playerClicks * 10), audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        function updateBars() {
-            const total = playerClicks + botClicks || 1;
-            const playerPercent = (playerClicks / total) * 100;
-            const botPercent = (botClicks / total) * 100;
+        function createBlast(isPlayer) {
+            const blast = document.createElement('div');
+            blast.classList.add('blast');
+            blast.classList.add(isPlayer ? 'player-blast' : 'bot-blast');
+            arena.appendChild(blast);
+            setTimeout(() => blast.remove(), 500);
+        }
 
-            playerBar.style.width = playerPercent + '%';
-            botBar.style.width = botPercent + '%';
+        function playerAttack() {
+            playerChar.classList.add('attacking');
+            setTimeout(() => playerChar.classList.remove('attacking'), 300);
+            createBlast(true);
+            playSound(600 + playerClicks * 20);
+        }
+
+        function botAttack() {
+            botChar.classList.add('attacking');
+            setTimeout(() => botChar.classList.remove('attacking'), 300);
+            createBlast(false);
+            playSound(400);
         }
 
         function botClick() {
             if (!gameActive) return;
 
-            // Bot clicks at random intervals (4-7 CPS average)
-            const randomDelay = 140 + Math.random() * 110; // 140-250ms = 4-7 CPS
+            const randomDelay = 140 + Math.random() * 110;
 
             setTimeout(() => {
                 if (gameActive) {
                     botClicks++;
                     botScoreEl.textContent = botClicks;
-                    updateBars();
-                    botClick(); // Schedule next click
+                    botAttack();
+                    botClick();
                 }
             }, randomDelay);
         }
@@ -438,13 +560,18 @@
             gameStarted = true;
             gameActive = true;
             clickBtn.classList.remove('pulsing');
+            clickBtn.querySelector('.instructions').textContent = 'Keep clicking!';
 
-            // Start bot clicking
             botClick();
 
             interval = setInterval(() => {
                 timeLeft--;
-                timeLeftEl.textContent = timeLeft;
+                timerEl.textContent = timeLeft;
+
+                if (timeLeft <= 3) {
+                    timerEl.style.color = 'var(--neon-red)';
+                    timerEl.style.animation = 'pulse 0.5s infinite';
+                }
 
                 if (timeLeft <= 0) {
                     endGame();
@@ -456,7 +583,7 @@
             clearInterval(interval);
             gameActive = false;
             clickBtn.disabled = true;
-            clickBtn.style.opacity = '0.5';
+            clickBtn.style.opacity = '0.3';
 
             finalPlayerScoreEl.textContent = playerClicks;
             finalBotScoreEl.textContent = botClicks;
@@ -465,30 +592,20 @@
                 resultTitle.textContent = 'VICTORY!';
                 resultTitle.classList.add('victory');
                 const diff = playerClicks - botClicks;
-                verdictEl.textContent = `You won by ${diff} click${diff > 1 ? 's' : ''}! 🎉`;
+                verdictEl.textContent = `You dominated with ${diff} more attack${diff > 1 ? 's' : ''}! 🏆`;
             } else if (playerClicks < botClicks) {
                 resultTitle.textContent = 'DEFEAT!';
                 resultTitle.classList.add('defeat-text');
                 resultEl.classList.add('defeat');
                 const diff = botClicks - playerClicks;
-                verdictEl.textContent = `The bot beat you by ${diff} click${diff > 1 ? 's' : ''}! Try again! 💪`;
+                verdictEl.textContent = `The bot overwhelmed you by ${diff} attack${diff > 1 ? 's' : ''}! Train harder! 💪`;
             } else {
                 resultTitle.textContent = 'DRAW!';
                 resultTitle.classList.add('victory');
-                verdictEl.textContent = 'Perfect tie! Impressive! 🤝';
+                verdictEl.textContent = 'Perfect balance! Both warriors are equally matched! ⚖️';
             }
 
             resultEl.classList.add('show');
-        }
-
-        function createParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.textContent = '+1';
-            particle.style.left = x + 'px';
-            particle.style.top = y + 'px';
-            document.body.appendChild(particle);
-            setTimeout(() => particle.remove(), 500);
         }
 
         clickBtn.addEventListener('click', (e) => {
@@ -500,20 +617,9 @@
 
             playerClicks++;
             playerScoreEl.textContent = playerClicks;
-            updateBars();
-            playClickSound();
-
-            // Visual feedback
-            createParticle(e.clientX, e.clientY);
-
-            // Button pulse
-            clickBtn.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                clickBtn.style.transform = 'scale(1)';
-            }, 50);
+            playerAttack();
         });
 
-        // Prevent double-click text selection
         clickBtn.addEventListener('mousedown', (e) => e.preventDefault());
     </script>
 </body>
