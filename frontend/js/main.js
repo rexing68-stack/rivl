@@ -157,7 +157,7 @@ function startGame(gameId) {
     // Qui apriremmo una pagina di gioco o un modal.
     // Per la demo mostriamo solo un alert.
     // alert(`Avvio ${gameId} – il wallet ${userAddress} è pronto!`);
-    const game = games.find(g => g.id === gameId);
+    const game = window.games.find(g => g.id === gameId);
     if (game) {
         window.location.href = game.page;
     }

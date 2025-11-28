@@ -403,7 +403,7 @@
 
     <script>
         const gameArea = document.getElementById('gameArea');
-        const scoreEl = document.ge('score');
+        const scoreEl = document.getElementById('score');
         const timeEl = document.getElementById('time');
         const accuracyEl = document.getElementById('accuracy');
         const startScreen = document.getElementById('startScreen');
@@ -437,7 +437,7 @@
         // Audio Context
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        funcnd(type) {
+        function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -456,10 +456,10 @@
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
                 osc.start();
-              udioCtx.currentTime + 0.2);
+                osc.stop(audioCtx.currentTime + 0.2);
             } else if (type === 'spawn') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(400, audioCtx.currentTime);
@@ -475,68 +475,75 @@
 
             const target = document.createElement('div');
             const size = Math.random() * 40 + 30; // 30px to 70px
-            const isGolden = Math.random() < 0.1; //for golden target
-            
+            const isGolden = Math.random() < 0.1; // 10% chance for golden target
+
             target.classList.add('target');
-            if arget.classList.add('golden');
-            
+            if (isGolden) target.classList.add('golden');
+
             target.style.width = size + 'px';
             target.style.height = size + 'px';
-         // Random position (keeping away from edges)
-            const x = Math.random() * (window.innerWidth - 100)   const y = Math.random() * (window.innerHeight - 150) + 100; // Account for HUD
-            
+
+            // Random position (keeping away from edges)
+            const x = Math.random() * (window.innerWidth - 100) + 50;
+            const y = Math.random() * (window.innerHeight - 150) + 100; // Account for HUD
+
             target.style.left = x + 'px';
             target.style.top = y + 'px';
-             // Data for scoring
+
+            // Data for scoring
             target.dataset.points = isGolden ? 300 : Math.floor(150 - size); // Smaller = more points
             target.dataset.id = Date.now();
 
             // Click handler
-            target.addEventListene', (e) => {
+            target.addEventListener('mousedown', (e) => {
                 e.stopPropagation(); // Prevent game area click (miss)
                 hitTarget(target, e.clientX, e.clientY);
             });
 
-   Auto-remove after some time
+            // Auto-remove after some time
             const lifeTime = isGolden ? 1500 : 2000;
             setTimeout(() => {
-        target.parentNode) {
+                if (target.parentNode) {
                     target.remove();
                     // Optional: penalty for missing a target? For now, no penalty for timeout, just missed opportunity.
                 }
-            }, l           gameArea.appendChild(target);
+            }, lifeTime);
+
+            gameArea.appendChild(target);
             playSound('spawn');
-       function hitTarget(target, x, y) {
+        }
+
+        function hitTarget(target, x, y) {
             if (!gameActive) return;
-            
+
             hits++;
             totalClicks++; // Valid click
-            
+
             const points = parseInt(target.dataset.points);
             score += points;
-            sontent = score;
-            
+            scoreEl.textContent = score;
+
             // Visual feedback
-            showFloating x, y);
+            showFloatingText(points, x, y);
             createHitMarker(x, y);
-            
+
             target.remove();
             playSound('hit');
             updateAccuracy();
 
-            // rget immediately on hit to keep flow fast
+            // Spawn new target immediately on hit to keep flow fast
             createTarget();
         }
 
         function handleMiss(e) {
             if (!gameActive) return;
-      ore clicks on HUD or buttons
-            if (e.target.closest('.hud') || e.targettn')) return;
+            // Ignore clicks on HUD or buttons
+            if (e.target.closest('.hud') || e.target.closest('.btn')) return;
 
             totalClicks++;
             score = Math.max(0, score - 50); // Penalty
             scoreEl.textContent = score;
-            
+
             showFloatingText("-50", e.clientX, e.clientY, true);
             playSound('miss');
             updateAccuracy();
@@ -548,13 +555,14 @@
             el.textContent = isNegative ? text : '+' + text;
             el.style.left = x + 'px';
             el.style.top = y + 'px';
-            er = isNegative ? '#ff0055' : (text > 200 ? '#ffd700' : '#fff');
+            el.style.color = isNegative ? '#ff0055' : (text > 200 ? '#ffd700' : '#fff');
             gameArea.appendChild(el);
-            setTimeout(() => el.remo        }
+            setTimeout(() => el.remove(), 800);
+        }
 
         function createHitMarker(x, y) {
             const el = document.createElement('div');
-            eadd('hit-marker');
+            el.classList.add('hit-marker');
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             gameArea.appendChild(el);
@@ -566,28 +574,32 @@
             accuracyEl.textContent = acc + '%';
         }
 
- ion startGame() {
-            startScreen.classList.a;
+        function startGame() {
+            startScreen.classList.add('hidden');
             gameActive = true;
             score = 0;
-            tim            totalClicks = 0;
+            timeLeft = 30;
+            totalClicks = 0;
             hits = 0;
-            
+
             scoreEl.textContent = '0';
             timeEl.textContent = '30.0';
             accuracyEl.textContent = '100%';
-            
+
             // Clear existing targets
             gameArea.innerHTML = '';
-            
+
             // Global click listener for misses
             window.addEventListener('mousedown', handleMiss);
 
             // Spawn loop
             spawnInterval = setInterval(() => {
-                if (document.querySelectorAll('.target').length < 5) { // Max 5 targ                    createTarget();
+                if (document.querySelectorAll('.target').length < 5) { // Max 5 targets at once
+                    createTarget();
                 }
-            }, 400); // Spawn ever         // Initial targets
+            }, 400); // Spawn every 400ms
+
+            // Initial targets
             createTarget();
             createTarget();
 
@@ -595,7 +607,7 @@
             timerInterval = setInterval(() => {
                 timeLeft -= 0.1;
                 timeEl.textContent = timeLeft.toFixed(1);
-                
+
                 if (timeLeft <= 0) {
                     endGame();
                 }
@@ -603,18 +615,19 @@
         }
 
         function endGame() {
-            gameActiv           clearInterval(spawnInterval);
-        erval(timerInterval);
-            window.remvener('mousedown', handleMiss);
-            
+            gameActive = false;
+            clearInterval(spawnInterval);
+            clearInterval(timerInterval);
+            window.removeEventListener('mousedown', handleMiss);
+
             const acc = totalClicks === 0 ? 0 : Math.round((hits / totalClicks) * 100);
-            
+
             finalStats.innerHTML = `
                 SCORE: <span style="color:#00ffcc">${score}</span><br>
                 ACCURACY: <span style="color:#00ffcc">${acc}%</span><br>
                 TARGETS HIT: <span style="color:#00ffcc">${hits}</span>
             `;
-            
+
             gameOverScreen.classList.remove('hidden');
         }
     </script>
