@@ -5,13 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Click Frenzy – Minigame Arena</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --player-color: #00ff41;
-            --enemy-color: #ff0055;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -19,9 +14,7 @@
         }
 
         body {
-            background: linear-gradient(180deg, #0a0014 0%, #1a0528 50%, #0a0014 100%);
-            color: white;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Fredoka', sans-serif;
             overflow: hidden;
             height: 100vh;
             user-select: none;
@@ -31,238 +24,271 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            color: white;
+            color: #333;
             text-decoration: none;
-            font-size: 0.8rem;
-            opacity: 0.7;
+            font-size: 0.9rem;
+            font-weight: 600;
             z-index: 100;
-            text-shadow: 0 0 10px black;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Arena */
+        /* Beautiful landscape background */
         .arena {
             position: relative;
             width: 100%;
             height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #90EE90 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 1s, filter 1s;
+            transition: transform 1s;
         }
 
         .arena.ko-cam {
-            transform: scale(1.5);
-            filter: contrast(1.5) saturate(2);
+            transform: scale(1.3);
         }
 
-        /* Animated background */
-        .bg-particles {
+        /* Sky with clouds */
+        .sky {
             position: absolute;
+            top: 0;
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            height: 60%;
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%);
         }
 
-        .particle {
+        .cloud {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: float 10s infinite;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.8;
+            animation: float 20s infinite linear;
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
+            from {
+                transform: translateX(-200px);
             }
 
-            50% {
-                opacity: 1;
+            to {
+                transform: translateX(calc(100vw + 200px));
             }
         }
 
-        /* Floor */
-        .floor {
+        /* Mountains */
+        .mountains {
             position: absolute;
-            bottom: 0;
+            bottom: 40%;
             width: 100%;
             height: 300px;
-            background: linear-gradient(180deg, transparent, rgba(50, 20, 80, 0.3));
-            border-top: 2px solid rgba(180, 0, 255, 0.3);
         }
 
-        .floor::before {
+        .mountain {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 300px solid #8B7355;
+        }
+
+        .mountain::before {
             content: '';
+            position: absolute;
+            bottom: -300px;
+            left: -200px;
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 300px solid #A0826D;
+        }
+
+        .mountain-snow {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 80px solid white;
+        }
+
+        /* Grass field */
+        .grass {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 150px;
-            background:
-                repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(180, 0, 255, 0.1) 48px, rgba(180, 0, 255, 0.1) 50px);
-            transform: perspective(500px) rotateX(60deg);
-            transform-origin: bottom;
+            height: 40%;
+            background: linear-gradient(180deg, #90EE90 0%, #228B22 100%);
         }
 
-        /* Warriors - Much more detailed */
+        .grass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(90deg, #76B947 0px, #76B947 10px, #90EE90 10px, #90EE90 20px);
+        }
+
+        /* Cute cartoon warriors */
         .warrior {
             position: absolute;
-            bottom: 300px;
-            width: 150px;
-            height: 200px;
+            bottom: 35%;
+            width: 120px;
+            height: 160px;
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+            filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.3));
         }
 
         .player-warrior {
-            left: 30%;
+            left: 25%;
         }
 
         .enemy-warrior {
-            right: 30%;
+            right: 25%;
             transform: scaleX(-1);
         }
 
-        /* Warrior body with realistic proportions */
-        .warrior-container {
+        /* Warrior body - cute style */
+        .warrior-body {
             position: relative;
             width: 100%;
             height: 100%;
         }
 
-        /* Head with helmet */
+        /* Cute head */
         .warrior-head {
             position: absolute;
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 50px;
+            width: 60px;
             height: 60px;
+            background: #FFD1A4;
+            border-radius: 50%;
+            border: 3px solid #8B4513;
         }
 
+        /* Eyes */
+        .eye {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            top: 25px;
+        }
+
+        .eye-left {
+            left: 15px;
+        }
+
+        .eye-right {
+            right: 15px;
+        }
+
+        /* Smile */
+        .smile {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 15px;
+            border: 3px solid #333;
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+        }
+
+        /* Helmet - colorful */
         .helmet {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #666, #999, #666);
-            border-radius: 50% 50% 45% 45%;
-            position: relative;
-            box-shadow:
-                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
-                inset 5px 5px 10px rgba(255, 255, 255, 0.3);
+            position: absolute;
+            top: -10px;
+            left: -5px;
+            right: -5px;
+            height: 35px;
+            background: linear-gradient(135deg, #4169E1, #6495ED);
+            border-radius: 50% 50% 0 0;
+            border: 3px solid #1E3A8A;
         }
 
         .player-warrior .helmet {
-            border: 2px solid var(--player-color);
-            box-shadow:
-                0 0 20px var(--player-color),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
-                inset 5px 5px 10px rgba(0, 255, 65, 0.3);
+            background: linear-gradient(135deg, #4169E1, #6495ED);
         }
 
         .enemy-warrior .helmet {
-            border: 2px solid var(--enemy-color);
-            box-shadow:
-                0 0 20px var(--enemy-color),
-                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
-                inset 5px 5px 10px rgba(255, 0, 85, 0.3);
+            background: linear-gradient(135deg, #DC143C, #FF6B6B);
         }
 
-        .visor {
+        .helmet-plume {
             position: absolute;
-            bottom: 15px;
-            left: 10px;
-            right: 10px;
-            height: 20px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.8));
-            border-radius: 3px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 25px;
+            background: #FFD700;
+            border-radius: 50% 50% 0 0;
         }
 
-        .player-warrior .visor {
-            background: linear-gradient(180deg, rgba(0, 255, 65, 0.3), rgba(0, 0, 0, 0.9));
-        }
-
-        .enemy-warrior .visor {
-            background: linear-gradient(180deg, rgba(255, 0, 85, 0.3), rgba(0, 0, 0, 0.9));
-        }
-
-        /* Torso with detailed armor */
+        /* Body - armor */
         .warrior-torso {
             position: absolute;
             top: 65px;
             left: 50%;
             transform: translateX(-50%);
             width: 70px;
-            height: 80px;
-            background: linear-gradient(135deg, #555, #888, #555);
-            border-radius: 10px 10px 5px 5px;
-            box-shadow:
-                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
-                inset 5px 5px 15px rgba(255, 255, 255, 0.2);
+            height: 70px;
+            background: linear-gradient(135deg, #C0C0C0, #E8E8E8);
+            border-radius: 10px;
+            border: 3px solid #696969;
         }
 
         .player-warrior .warrior-torso {
-            border: 2px solid var(--player-color);
-            box-shadow:
-                0 0 20px var(--player-color),
-                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
-                inset 5px 5px 15px rgba(0, 255, 65, 0.2);
+            background: linear-gradient(135deg, #4169E1, #6495ED);
+            border-color: #1E3A8A;
         }
 
         .enemy-warrior .warrior-torso {
-            border: 2px solid var(--enemy-color);
-            box-shadow:
-                0 0 20px var(--enemy-color),
-                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
-                inset 5px 5px 15px rgba(255, 0, 85, 0.2);
+            background: linear-gradient(135deg, #DC143C, #FF6B6B);
+            border-color: #8B0000;
         }
 
-        /* Armor plates */
-        .armor-plate {
-            position: absolute;
-            width: 60px;
-            height: 25px;
-            background: linear-gradient(135deg, #777, #aaa);
-            border-radius: 5px;
-            top: 10px;
-            left: 5px;
-            box-shadow:
-                inset -2px -2px 5px rgba(0, 0, 0, 0.5),
-                inset 2px 2px 5px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Arms */
+        /* Arms - cute and chubby */
         .warrior-arm {
             position: absolute;
-            width: 20px;
-            height: 70px;
-            background: linear-gradient(135deg, #666, #999);
-            border-radius: 10px;
+            width: 22px;
+            height: 60px;
+            background: #FFD1A4;
+            border-radius: 15px;
+            border: 3px solid #8B4513;
             top: 70px;
-            box-shadow:
-                inset -3px -3px 8px rgba(0, 0, 0, 0.5),
-                inset 3px 3px 8px rgba(255, 255, 255, 0.2);
             transform-origin: top center;
             transition: transform 0.2s;
         }
 
         .arm-left {
-            left: 15px;
+            left: 10px;
         }
 
         .arm-right {
-            right: 15px;
+            right: 10px;
         }
 
-        /* Sword - much more detailed */
+        /* Cute sword */
         .sword {
             position: absolute;
-            width: 12px;
-            height: 100px;
-            bottom: -95px;
+            width: 14px;
+            height: 80px;
+            bottom: -75px;
             left: 4px;
             transform-origin: top center;
             transition: all 0.2s;
@@ -270,195 +296,143 @@
 
         .sword-blade {
             width: 100%;
-            height: 85%;
-            background: linear-gradient(90deg, #ccc, #fff, #ccc);
-            border-radius: 2px 2px 0 0;
-            box-shadow:
-                0 0 10px rgba(255, 255, 255, 0.5),
-                inset -2px 0 5px rgba(0, 0, 0, 0.3),
-                inset 2px 0 5px rgba(255, 255, 255, 0.8);
-            position: relative;
-        }
-
-        .sword-blade::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(200, 200, 200, 0.5));
+            height: 70%;
+            background: linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0);
+            border-radius: 3px 3px 0 0;
+            border: 2px solid #696969;
         }
 
         .sword-guard {
-            width: 30px;
-            height: 8px;
-            background: linear-gradient(135deg, #444, #888);
+            width: 35px;
+            height: 10px;
+            background: #FFD700;
             position: absolute;
-            bottom: 15%;
-            left: -9px;
-            border-radius: 2px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            bottom: 30%;
+            left: -10px;
+            border-radius: 5px;
+            border: 2px solid #B8860B;
         }
 
         .sword-handle {
-            width: 12px;
-            height: 15%;
-            background: linear-gradient(135deg, #8B4513, #D2691E);
+            width: 14px;
+            height: 30%;
+            background: #8B4513;
             position: absolute;
             bottom: 0;
-            border-radius: 0 0 3px 3px;
-            box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.5);
+            border-radius: 0 0 5px 5px;
+            border: 2px solid #654321;
         }
 
-        /* Legs */
+        /* Legs - cute */
         .warrior-legs {
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .leg {
-            width: 25px;
-            height: 60px;
-            background: linear-gradient(135deg, #555, #888);
+            width: 28px;
+            height: 50px;
+            background: #8B4513;
             border-radius: 5px;
-            box-shadow:
-                inset -3px -3px 8px rgba(0, 0, 0, 0.5),
-                inset 3px 3px 8px rgba(255, 255, 255, 0.2);
+            border: 3px solid #654321;
         }
 
         /* Attack animation */
         .warrior.attacking .arm-right {
-            transform: rotate(-110deg);
+            transform: rotate(-100deg);
         }
 
         .warrior.attacking .sword {
-            transform: rotate(-60deg);
-            filter: drop-shadow(0 0 15px yellow);
+            transform: rotate(-50deg);
         }
 
-        /* Hit effect */
+        /* Hit effect - bounce */
         .warrior.hit {
-            animation: hitShake 0.3s;
+            animation: bounce 0.3s;
         }
 
-        @keyframes hitShake {
+        @keyframes bounce {
 
             0%,
             100% {
-                transform: translateX(0);
-                filter: brightness(1);
+                transform: translateY(0);
             }
 
-            25% {
-                transform: translateX(-10px);
-                filter: brightness(2);
-            }
-
-            75% {
-                transform: translateX(10px);
-                filter: brightness(2);
+            50% {
+                transform: translateY(-20px);
             }
         }
 
-        /* KO animation */
+        /* KO animation - fall down */
         .warrior.ko {
-            animation: knockout 1.2s forwards;
+            animation: fallDown 1s forwards;
         }
 
-        @keyframes knockout {
+        @keyframes fallDown {
             0% {
                 transform: rotate(0deg) translateY(0);
                 opacity: 1;
             }
 
-            30% {
-                transform: rotate(90deg) translateY(-30px);
-            }
-
-            60% {
-                transform: rotate(180deg) translateY(0);
-            }
-
             100% {
-                transform: rotate(270deg) translateY(200px);
+                transform: rotate(90deg) translateY(200px);
                 opacity: 0;
             }
         }
 
         .enemy-warrior.ko {
-            animation: knockoutEnemy 1.2s forwards;
+            animation: fallDownEnemy 1s forwards;
         }
 
-        @keyframes knockoutEnemy {
+        @keyframes fallDownEnemy {
             0% {
                 transform: scaleX(-1) rotate(0deg) translateY(0);
                 opacity: 1;
             }
 
-            30% {
-                transform: scaleX(-1) rotate(-90deg) translateY(-30px);
-            }
-
-            60% {
-                transform: scaleX(-1) rotate(-180deg) translateY(0);
-            }
-
             100% {
-                transform: scaleX(-1) rotate(-270deg) translateY(200px);
+                transform: scaleX(-1) rotate(-90deg) translateY(200px);
                 opacity: 0;
             }
         }
 
-        /* Slash effect */
-        .slash-effect {
+        /* Impact stars */
+        .impact {
             position: absolute;
-            width: 150px;
-            height: 150px;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            pointer-events: none;
+            font-size: 4rem;
             opacity: 0;
+            pointer-events: none;
         }
 
-        .slash-effect.active {
-            animation: slashAnim 0.4s;
+        .impact.active {
+            animation: impactAnim 0.5s;
         }
 
-        @keyframes slashAnim {
+        @keyframes impactAnim {
             0% {
                 opacity: 0;
-                transform: translate(-50%, -50%) rotate(0deg) scale(0.5);
+                transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
             }
 
             50% {
                 opacity: 1;
-                transform: translate(-50%, -50%) rotate(180deg) scale(1.3);
+                transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
             }
 
             100% {
                 opacity: 0;
-                transform: translate(-50%, -50%) rotate(360deg) scale(0.7);
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
             }
         }
 
-        .slash-arc {
-            width: 100%;
-            height: 100%;
-            border: 5px solid transparent;
-            border-top-color: yellow;
-            border-right-color: yellow;
-            border-radius: 50%;
-            box-shadow: 0 0 20px yellow;
-        }
-
-        /* HUD */
+        /* HUD - friendly style */
         .hud {
             position: absolute;
             top: 30px;
@@ -470,26 +444,22 @@
         }
 
         .score-display {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px 30px;
-            border-radius: 10px;
-            border: 2px solid;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 20px;
             font-size: 2rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px currentColor;
-            backdrop-filter: blur(10px);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .player-score-display {
-            border-color: var(--player-color);
-            color: var(--player-color);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            color: #4169E1;
+            border: 4px solid #4169E1;
         }
 
         .enemy-score-display {
-            border-color: var(--enemy-color);
-            color: var(--enemy-color);
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+            color: #DC143C;
+            border: 4px solid #DC143C;
         }
 
         /* Timer */
@@ -498,16 +468,15 @@
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 3px solid #b400ff;
-            border-radius: 15px;
+            background: white;
+            border: 4px solid #FFD700;
+            border-radius: 20px;
             padding: 15px 40px;
             font-size: 3rem;
-            font-weight: bold;
-            color: #b400ff;
-            text-shadow: 0 0 20px #b400ff;
+            font-weight: 700;
+            color: #FF8C00;
             z-index: 10;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         /* Click button */
@@ -516,41 +485,40 @@
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            border: 4px solid #b400ff;
-            background: radial-gradient(circle, rgba(180, 0, 255, 0.3), transparent);
+            border: 5px solid #FFD700;
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
             color: white;
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 0 40px rgba(180, 0, 255, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            backdrop-filter: blur(5px);
         }
 
         .click-button:active {
-            transform: translateX(-50%) scale(0.9);
+            transform: translateX(-50%) scale(0.95);
         }
 
         .click-button.pulsing {
-            animation: pulse 0.5s infinite;
+            animation: pulse 0.8s infinite;
         }
 
         @keyframes pulse {
 
             0%,
             100% {
-                box-shadow: 0 0 40px rgba(180, 0, 255, 0.5);
+                transform: translateX(-50%) scale(1);
             }
 
             50% {
-                box-shadow: 0 0 60px rgba(180, 0, 255, 1);
+                transform: translateX(-50%) scale(1.1);
             }
         }
 
@@ -560,14 +528,14 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
+            background: white;
             padding: 50px 70px;
-            border-radius: 20px;
-            border: 4px solid;
+            border-radius: 30px;
+            border: 5px solid;
             display: none;
             z-index: 100;
             text-align: center;
-            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .result.show {
@@ -576,13 +544,11 @@
         }
 
         .result.victory {
-            border-color: var(--player-color);
-            box-shadow: 0 0 60px var(--player-color);
+            border-color: #4169E1;
         }
 
         .result.defeat {
-            border-color: var(--enemy-color);
-            box-shadow: 0 0 60px var(--enemy-color);
+            border-color: #DC143C;
         }
 
         @keyframes fadeIn {
@@ -600,67 +566,85 @@
         .result h2 {
             font-size: 4rem;
             margin-bottom: 30px;
-            text-shadow: 0 0 20px currentColor;
         }
 
         .result.victory h2 {
-            color: var(--player-color);
+            color: #4169E1;
         }
 
         .result.defeat h2 {
-            color: var(--enemy-color);
+            color: #DC143C;
         }
 
         .final-stats {
             font-size: 1.5rem;
             margin: 20px 0;
+            color: #333;
         }
 
         .restart-btn {
             margin-top: 30px;
             padding: 15px 50px;
-            background: #b400ff;
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
             border: none;
-            border-radius: 10px;
+            border-radius: 20px;
             color: white;
             font-size: 1.3rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .restart-btn:hover {
-            background: var(--player-color);
-            color: black;
+            background: linear-gradient(135deg, #FFA500, #FFB733);
         }
     </style>
 </head>
 
 <body>
 
-    <a href="/" class="nav-back">← BACK TO HUB</a>
-
-    <div class="bg-particles" id="particles"></div>
+    <a href="/" class="nav-back">← Back to Hub</a>
 
     <div class="arena" id="arena">
-        <div class="floor"></div>
-
-        <!-- Slash effect -->
-        <div class="slash-effect" id="slashEffect">
-            <div class="slash-arc"></div>
+        <!-- Sky -->
+        <div class="sky">
+            <div class="cloud" style="top: 10%; left: 10%; width: 100px; height: 50px; animation-delay: 0s;"></div>
+            <div class="cloud" style="top: 20%; left: 60%; width: 120px; height: 60px; animation-delay: 5s;"></div>
+            <div class="cloud" style="top: 15%; left: 80%; width: 80px; height: 40px; animation-delay: 10s;"></div>
         </div>
+
+        <!-- Mountains -->
+        <div class="mountains">
+            <div class="mountain" style="left: 10%;">
+                <div class="mountain-snow"></div>
+            </div>
+            <div class="mountain" style="left: 35%; transform: scale(0.8);">
+                <div class="mountain-snow"></div>
+            </div>
+            <div class="mountain" style="right: 15%;">
+                <div class="mountain-snow"></div>
+            </div>
+        </div>
+
+        <!-- Grass -->
+        <div class="grass"></div>
+
+        <!-- Impact effect -->
+        <div class="impact" id="impact">💥</div>
 
         <!-- Player Warrior -->
         <div class="warrior player-warrior" id="playerWarrior">
-            <div class="warrior-container">
+            <div class="warrior-body">
                 <div class="warrior-head">
                     <div class="helmet">
-                        <div class="visor"></div>
+                        <div class="helmet-plume"></div>
                     </div>
+                    <div class="eye eye-left"></div>
+                    <div class="eye eye-right"></div>
+                    <div class="smile"></div>
                 </div>
-                <div class="warrior-torso">
-                    <div class="armor-plate"></div>
-                </div>
+                <div class="warrior-torso"></div>
                 <div class="warrior-arm arm-left"></div>
                 <div class="warrior-arm arm-right">
                     <div class="sword">
@@ -678,15 +662,16 @@
 
         <!-- Enemy Warrior -->
         <div class="warrior enemy-warrior" id="enemyWarrior">
-            <div class="warrior-container">
+            <div class="warrior-body">
                 <div class="warrior-head">
                     <div class="helmet">
-                        <div class="visor"></div>
+                        <div class="helmet-plume"></div>
                     </div>
+                    <div class="eye eye-left"></div>
+                    <div class="eye eye-right"></div>
+                    <div class="smile"></div>
                 </div>
-                <div class="warrior-torso">
-                    <div class="armor-plate"></div>
-                </div>
+                <div class="warrior-torso"></div>
                 <div class="warrior-arm arm-left"></div>
                 <div class="warrior-arm arm-right">
                     <div class="sword">
@@ -713,30 +698,19 @@
 
         <!-- Click button -->
         <button class="click-button pulsing" id="clickBtn">
-            <div>⚔️ STRIKE!</div>
-            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">Click to attack</div>
+            <div>⚔️ ATTACK!</div>
+            <div style="font-size: 0.9rem; margin-top: 5px;">Click fast!</div>
         </button>
     </div>
 
     <!-- Result -->
     <div class="result" id="result">
-        <h2 id="resultTitle">DUEL OVER!</h2>
+        <h2 id="resultTitle">Battle Over!</h2>
         <div class="final-stats" id="finalStats"></div>
-        <button class="restart-btn" onclick="location.reload()">REMATCH</button>
+        <button class="restart-btn" onclick="location.reload()">Play Again</button>
     </div>
 
     <script>
-        // Create animated particles
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 50; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 10 + 's';
-            particle.style.animationDuration = (5 + Math.random() * 10) + 's';
-            particlesContainer.appendChild(particle);
-        }
-
         let playerHits = 0;
         let enemyHits = 0;
         let timeLeft = 30;
@@ -750,65 +724,56 @@
         const enemyScoreEl = document.getElementById('enemyScore');
         const timerEl = document.getElementById('timer');
         const clickBtn = document.getElementById('clickBtn');
-        const slashEffect = document.getElementById('slashEffect');
+        const impact = document.getElementById('impact');
         const resultEl = document.getElementById('result');
         const resultTitle = document.getElementById('resultTitle');
         const finalStats = document.getElementById('finalStats');
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playSound(type) {
+        function playSound(freq) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (type === 'slash') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
-            } else if (type === 'hit') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            }
-
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        function playerSlash() {
+        function playerAttack() {
             playerWarrior.classList.add('attacking');
-            slashEffect.classList.add('active');
+            impact.classList.add('active');
 
             setTimeout(() => {
                 playerWarrior.classList.remove('attacking');
-                slashEffect.classList.remove('active');
-            }, 400);
+                impact.classList.remove('active');
+            }, 300);
 
             enemyWarrior.classList.add('hit');
             setTimeout(() => enemyWarrior.classList.remove('hit'), 300);
 
-            playSound('slash');
-            setTimeout(() => playSound('hit'), 150);
+            playSound(600);
         }
 
-        function enemySlash() {
+        function enemyAttack() {
             enemyWarrior.classList.add('attacking');
-            slashEffect.classList.add('active');
+            impact.classList.add('active');
 
             setTimeout(() => {
                 enemyWarrior.classList.remove('attacking');
-                slashEffect.classList.remove('active');
-            }, 400);
+                impact.classList.remove('active');
+            }, 300);
 
             playerWarrior.classList.add('hit');
             setTimeout(() => playerWarrior.classList.remove('hit'), 300);
 
-            playSound('slash');
-            setTimeout(() => playSound('hit'), 150);
+            playSound(500);
         }
 
         function enemyAI() {
@@ -819,7 +784,7 @@
                 if (gameActive) {
                     enemyHits++;
                     enemyScoreEl.textContent = enemyHits;
-                    enemySlash();
+                    enemyAttack();
                     enemyAI();
                 }
             }, delay);
@@ -838,7 +803,7 @@
                 timerEl.textContent = timeLeft;
 
                 if (timeLeft <= 5) {
-                    timerEl.style.color = '#ff0055';
+                    timerEl.style.color = '#DC143C';
                 }
 
                 if (timeLeft <= 0) {
@@ -851,7 +816,7 @@
         function endGame() {
             gameActive = false;
             clickBtn.disabled = true;
-            clickBtn.style.opacity = '0';
+            clickBtn.style.opacity = '0.3';
 
             setTimeout(() => {
                 arena.classList.add('ko-cam');
@@ -864,21 +829,21 @@
 
                 setTimeout(() => {
                     if (playerHits > enemyHits) {
-                        resultTitle.textContent = 'VICTORY!';
+                        resultTitle.textContent = 'You Win! 🎉';
                         resultEl.classList.add('victory');
-                        finalStats.innerHTML = `You struck faster!<br>Your strikes: ${playerHits}<br>Enemy strikes: ${enemyHits}`;
+                        finalStats.innerHTML = `You were faster!<br>Your attacks: ${playerHits}<br>Enemy attacks: ${enemyHits}`;
                     } else if (playerHits < enemyHits) {
-                        resultTitle.textContent = 'DEFEAT!';
+                        resultTitle.textContent = 'You Lost! 😢';
                         resultEl.classList.add('defeat');
-                        finalStats.innerHTML = `The enemy was faster!<br>Your strikes: ${playerHits}<br>Enemy strikes: ${enemyHits}`;
+                        finalStats.innerHTML = `The enemy was faster!<br>Your attacks: ${playerHits}<br>Enemy attacks: ${enemyHits}`;
                     } else {
-                        resultTitle.textContent = 'DRAW!';
+                        resultTitle.textContent = 'Draw! 🤝';
                         resultEl.classList.add('victory');
-                        finalStats.innerHTML = `Perfect match!<br>Both: ${playerHits} strikes`;
+                        finalStats.innerHTML = `Perfect match!<br>Both: ${playerHits} attacks`;
                     }
 
                     resultEl.classList.add('show');
-                }, 1200);
+                }, 1000);
             }, 500);
         }
 
@@ -891,7 +856,7 @@
 
             playerHits++;
             playerScoreEl.textContent = playerHits;
-            playerSlash();
+            playerAttack();
         });
     </script>
 </body>
