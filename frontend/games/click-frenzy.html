@@ -19,7 +19,7 @@
         }
 
         body {
-            background: #0a0a0a;
+            background: linear-gradient(180deg, #0a0014 0%, #1a0528 50%, #0a0014 100%);
             color: white;
             font-family: 'Orbitron', sans-serif;
             overflow: hidden;
@@ -36,9 +36,10 @@
             font-size: 0.8rem;
             opacity: 0.7;
             z-index: 100;
+            text-shadow: 0 0 10px black;
         }
 
-        /* Battle Arena */
+        /* Arena */
         .arena {
             position: relative;
             width: 100%;
@@ -46,199 +47,379 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0a0a0a 100%);
             transition: transform 1s, filter 1s;
         }
 
         .arena.ko-cam {
-            transform: scale(1.8);
-            filter: contrast(1.8) saturate(2.5);
+            transform: scale(1.5);
+            filter: contrast(1.5) saturate(2);
         }
 
-        /* Floor circle */
-        .floor-circle {
+        /* Animated background */
+        .bg-particles {
             position: absolute;
-            width: 400px;
-            height: 400px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
             border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05), transparent);
+            animation: float 10s infinite;
         }
 
-        /* Soldiers */
-        .soldier {
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Floor */
+        .floor {
             position: absolute;
-            width: 100px;
-            transition: all 0.2s;
-            bottom: calc(50% - 75px);
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(180deg, transparent, rgba(50, 20, 80, 0.3));
+            border-top: 2px solid rgba(180, 0, 255, 0.3);
         }
 
-        .player-soldier {
-            left: calc(50% - 150px);
-            transform: scaleX(1);
+        .floor::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background:
+                repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(180, 0, 255, 0.1) 48px, rgba(180, 0, 255, 0.1) 50px);
+            transform: perspective(500px) rotateX(60deg);
+            transform-origin: bottom;
         }
 
-        .enemy-soldier {
-            right: calc(50% - 150px);
+        /* Warriors - Much more detailed */
+        .warrior {
+            position: absolute;
+            bottom: 300px;
+            width: 150px;
+            height: 200px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        }
+
+        .player-warrior {
+            left: 30%;
+        }
+
+        .enemy-warrior {
+            right: 30%;
             transform: scaleX(-1);
         }
 
-        /* Soldier body */
-        .soldier-body {
+        /* Warrior body with realistic proportions */
+        .warrior-container {
             position: relative;
-            width: 100px;
-            height: 150px;
+            width: 100%;
+            height: 100%;
         }
 
-        .head {
-            width: 40px;
-            height: 40px;
-            background: #ddd;
-            border-radius: 5px;
-            margin: 0 auto 5px;
-            position: relative;
+        /* Head with helmet */
+        .warrior-head {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 60px;
         }
 
         .helmet {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            height: 25px;
-            background: var(--soldier-color);
-            border-radius: 5px 5px 0 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #666, #999, #666);
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            box-shadow:
+                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.3);
         }
 
-        .player-soldier .helmet {
-            background: var(--player-color);
-            box-shadow: 0 0 10px var(--player-color);
+        .player-warrior .helmet {
+            border: 2px solid var(--player-color);
+            box-shadow:
+                0 0 20px var(--player-color),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 10px rgba(0, 255, 65, 0.3);
         }
 
-        .enemy-soldier .helmet {
-            background: var(--enemy-color);
-            box-shadow: 0 0 10px var(--enemy-color);
+        .enemy-warrior .helmet {
+            border: 2px solid var(--enemy-color);
+            box-shadow:
+                0 0 20px var(--enemy-color),
+                inset -5px -5px 10px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 10px rgba(255, 0, 85, 0.3);
         }
 
         .visor {
             position: absolute;
-            bottom: 5px;
-            left: 5px;
-            right: 5px;
-            height: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 2px;
+            bottom: 15px;
+            left: 10px;
+            right: 10px;
+            height: 20px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(50, 50, 50, 0.8));
+            border-radius: 3px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
         }
 
-        .torso {
-            width: 50px;
-            height: 60px;
-            background: #888;
-            margin: 0 auto;
+        .player-warrior .visor {
+            background: linear-gradient(180deg, rgba(0, 255, 65, 0.3), rgba(0, 0, 0, 0.9));
+        }
+
+        .enemy-warrior .visor {
+            background: linear-gradient(180deg, rgba(255, 0, 85, 0.3), rgba(0, 0, 0, 0.9));
+        }
+
+        /* Torso with detailed armor */
+        .warrior-torso {
+            position: absolute;
+            top: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 80px;
+            background: linear-gradient(135deg, #555, #888, #555);
+            border-radius: 10px 10px 5px 5px;
+            box-shadow:
+                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .player-warrior .warrior-torso {
+            border: 2px solid var(--player-color);
+            box-shadow:
+                0 0 20px var(--player-color),
+                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
+                inset 5px 5px 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .enemy-warrior .warrior-torso {
+            border: 2px solid var(--enemy-color);
+            box-shadow:
+                0 0 20px var(--enemy-color),
+                inset -5px -5px 15px rgba(0, 0, 0, 0.6),
+                inset 5px 5px 15px rgba(255, 0, 85, 0.2);
+        }
+
+        /* Armor plates */
+        .armor-plate {
+            position: absolute;
+            width: 60px;
+            height: 25px;
+            background: linear-gradient(135deg, #777, #aaa);
             border-radius: 5px;
-            position: relative;
-        }
-
-        .armor {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            background: var(--soldier-color);
-            border-radius: 3px;
-        }
-
-        .player-soldier .armor {
-            background: linear-gradient(180deg, var(--player-color), #00aa2e);
-        }
-
-        .enemy-soldier .armor {
-            background: linear-gradient(180deg, var(--enemy-color), #aa0033);
-        }
-
-        .arm {
-            position: absolute;
-            width: 15px;
-            height: 50px;
-            background: #888;
-            border-radius: 3px;
             top: 10px;
+            left: 5px;
+            box-shadow:
+                inset -2px -2px 5px rgba(0, 0, 0, 0.5),
+                inset 2px 2px 5px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Arms */
+        .warrior-arm {
+            position: absolute;
+            width: 20px;
+            height: 70px;
+            background: linear-gradient(135deg, #666, #999);
+            border-radius: 10px;
+            top: 70px;
+            box-shadow:
+                inset -3px -3px 8px rgba(0, 0, 0, 0.5),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.2);
             transform-origin: top center;
             transition: transform 0.2s;
         }
 
         .arm-left {
-            left: -12px;
+            left: 15px;
         }
 
         .arm-right {
-            right: -12px;
+            right: 15px;
         }
 
-        /* Sword */
+        /* Sword - much more detailed */
         .sword {
             position: absolute;
-            width: 6px;
-            height: 60px;
-            background: linear-gradient(180deg, #666, #ccc);
-            bottom: -55px;
+            width: 12px;
+            height: 100px;
+            bottom: -95px;
             left: 4px;
-            border-radius: 1px;
             transform-origin: top center;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
-        .sword::before {
+        .sword-blade {
+            width: 100%;
+            height: 85%;
+            background: linear-gradient(90deg, #ccc, #fff, #ccc);
+            border-radius: 2px 2px 0 0;
+            box-shadow:
+                0 0 10px rgba(255, 255, 255, 0.5),
+                inset -2px 0 5px rgba(0, 0, 0, 0.3),
+                inset 2px 0 5px rgba(255, 255, 255, 0.8);
+            position: relative;
+        }
+
+        .sword-blade::after {
             content: '';
             position: absolute;
-            top: -8px;
-            left: -4px;
-            width: 14px;
-            height: 8px;
-            background: #444;
-            border-radius: 2px;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(200, 200, 200, 0.5));
         }
 
-        .sword::after {
-            content: '';
+        .sword-guard {
+            width: 30px;
+            height: 8px;
+            background: linear-gradient(135deg, #444, #888);
+            position: absolute;
+            bottom: 15%;
+            left: -9px;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .sword-handle {
+            width: 12px;
+            height: 15%;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
             position: absolute;
             bottom: 0;
-            left: 0;
-            right: 0;
-            height: 10px;
-            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.8));
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 3px 3px;
+            box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .legs {
+        /* Legs */
+        .warrior-legs {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: center;
             gap: 10px;
-            margin-top: 5px;
         }
 
         .leg {
-            width: 18px;
-            height: 40px;
-            background: #666;
-            border-radius: 3px;
+            width: 25px;
+            height: 60px;
+            background: linear-gradient(135deg, #555, #888);
+            border-radius: 5px;
+            box-shadow:
+                inset -3px -3px 8px rgba(0, 0, 0, 0.5),
+                inset 3px 3px 8px rgba(255, 255, 255, 0.2);
         }
 
         /* Attack animation */
-        .soldier.attacking .arm-right {
-            transform: rotate(-90deg);
+        .warrior.attacking .arm-right {
+            transform: rotate(-110deg);
         }
 
-        .soldier.attacking .sword {
-            transform: rotate(-45deg);
-            filter: drop-shadow(0 0 10px yellow);
+        .warrior.attacking .sword {
+            transform: rotate(-60deg);
+            filter: drop-shadow(0 0 15px yellow);
+        }
+
+        /* Hit effect */
+        .warrior.hit {
+            animation: hitShake 0.3s;
+        }
+
+        @keyframes hitShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+                filter: brightness(1);
+            }
+
+            25% {
+                transform: translateX(-10px);
+                filter: brightness(2);
+            }
+
+            75% {
+                transform: translateX(10px);
+                filter: brightness(2);
+            }
+        }
+
+        /* KO animation */
+        .warrior.ko {
+            animation: knockout 1.2s forwards;
+        }
+
+        @keyframes knockout {
+            0% {
+                transform: rotate(0deg) translateY(0);
+                opacity: 1;
+            }
+
+            30% {
+                transform: rotate(90deg) translateY(-30px);
+            }
+
+            60% {
+                transform: rotate(180deg) translateY(0);
+            }
+
+            100% {
+                transform: rotate(270deg) translateY(200px);
+                opacity: 0;
+            }
+        }
+
+        .enemy-warrior.ko {
+            animation: knockoutEnemy 1.2s forwards;
+        }
+
+        @keyframes knockoutEnemy {
+            0% {
+                transform: scaleX(-1) rotate(0deg) translateY(0);
+                opacity: 1;
+            }
+
+            30% {
+                transform: scaleX(-1) rotate(-90deg) translateY(-30px);
+            }
+
+            60% {
+                transform: scaleX(-1) rotate(-180deg) translateY(0);
+            }
+
+            100% {
+                transform: scaleX(-1) rotate(-270deg) translateY(200px);
+                opacity: 0;
+            }
         }
 
         /* Slash effect */
         .slash-effect {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 150px;
+            height: 150px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -247,10 +428,10 @@
         }
 
         .slash-effect.active {
-            animation: slash 0.3s;
+            animation: slashAnim 0.4s;
         }
 
-        @keyframes slash {
+        @keyframes slashAnim {
             0% {
                 opacity: 0;
                 transform: translate(-50%, -50%) rotate(0deg) scale(0.5);
@@ -258,76 +439,23 @@
 
             50% {
                 opacity: 1;
-                transform: translate(-50%, -50%) rotate(180deg) scale(1.2);
+                transform: translate(-50%, -50%) rotate(180deg) scale(1.3);
             }
 
             100% {
                 opacity: 0;
-                transform: translate(-50%, -50%) rotate(360deg) scale(0.8);
+                transform: translate(-50%, -50%) rotate(360deg) scale(0.7);
             }
         }
 
-        .slash-effect svg {
+        .slash-arc {
             width: 100%;
             height: 100%;
-        }
-
-        /* Hit effect */
-        .soldier.hit {
-            animation: hitFlash 0.3s;
-        }
-
-        @keyframes hitFlash {
-
-            0%,
-            100% {
-                filter: brightness(1);
-            }
-
-            50% {
-                filter: brightness(3) hue-rotate(180deg);
-            }
-        }
-
-        /* KO animation */
-        .soldier.ko {
-            animation: knockout 1s forwards;
-        }
-
-        @keyframes knockout {
-            0% {
-                transform: rotate(0deg) translateY(0) scaleX(1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: rotate(180deg) translateY(-50px) scaleX(1);
-            }
-
-            100% {
-                transform: rotate(360deg) translateY(150px) scaleX(1);
-                opacity: 0;
-            }
-        }
-
-        .enemy-soldier.ko {
-            animation: knockoutEnemy 1s forwards;
-        }
-
-        @keyframes knockoutEnemy {
-            0% {
-                transform: rotate(0deg) translateY(0) scaleX(-1);
-                opacity: 1;
-            }
-
-            50% {
-                transform: rotate(-180deg) translateY(-50px) scaleX(-1);
-            }
-
-            100% {
-                transform: rotate(-360deg) translateY(150px) scaleX(-1);
-                opacity: 0;
-            }
+            border: 5px solid transparent;
+            border-top-color: yellow;
+            border-right-color: yellow;
+            border-radius: 50%;
+            box-shadow: 0 0 20px yellow;
         }
 
         /* HUD */
@@ -349,16 +477,19 @@
             font-size: 2rem;
             font-weight: bold;
             text-shadow: 0 0 10px currentColor;
+            backdrop-filter: blur(10px);
         }
 
         .player-score-display {
             border-color: var(--player-color);
             color: var(--player-color);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
         }
 
         .enemy-score-display {
             border-color: var(--enemy-color);
             color: var(--enemy-color);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
         }
 
         /* Timer */
@@ -376,6 +507,7 @@
             color: #b400ff;
             text-shadow: 0 0 20px #b400ff;
             z-index: 10;
+            backdrop-filter: blur(10px);
         }
 
         /* Click button */
@@ -399,6 +531,7 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            backdrop-filter: blur(5px);
         }
 
         .click-button:active {
@@ -434,6 +567,7 @@
             display: none;
             z-index: 100;
             text-align: center;
+            backdrop-filter: blur(20px);
         }
 
         .result.show {
@@ -506,53 +640,62 @@
 
     <a href="/" class="nav-back">← BACK TO HUB</a>
 
+    <div class="bg-particles" id="particles"></div>
+
     <div class="arena" id="arena">
-        <div class="floor-circle"></div>
+        <div class="floor"></div>
 
         <!-- Slash effect -->
         <div class="slash-effect" id="slashEffect">
-            <svg viewBox="0 0 100 100">
-                <path d="M 10 50 Q 50 10, 90 50" stroke="yellow" stroke-width="8" fill="none" opacity="0.8" />
-                <path d="M 10 50 Q 50 10, 90 50" stroke="white" stroke-width="4" fill="none" />
-            </svg>
+            <div class="slash-arc"></div>
         </div>
 
-        <!-- Player Soldier -->
-        <div class="soldier player-soldier" id="playerSoldier">
-            <div class="soldier-body">
-                <div class="head">
-                    <div class="helmet"></div>
-                    <div class="visor"></div>
-                </div>
-                <div class="torso">
-                    <div class="armor"></div>
-                    <div class="arm arm-left"></div>
-                    <div class="arm arm-right">
-                        <div class="sword"></div>
+        <!-- Player Warrior -->
+        <div class="warrior player-warrior" id="playerWarrior">
+            <div class="warrior-container">
+                <div class="warrior-head">
+                    <div class="helmet">
+                        <div class="visor"></div>
                     </div>
                 </div>
-                <div class="legs">
+                <div class="warrior-torso">
+                    <div class="armor-plate"></div>
+                </div>
+                <div class="warrior-arm arm-left"></div>
+                <div class="warrior-arm arm-right">
+                    <div class="sword">
+                        <div class="sword-blade"></div>
+                        <div class="sword-guard"></div>
+                        <div class="sword-handle"></div>
+                    </div>
+                </div>
+                <div class="warrior-legs">
                     <div class="leg"></div>
                     <div class="leg"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Enemy Soldier -->
-        <div class="soldier enemy-soldier" id="enemySoldier">
-            <div class="soldier-body">
-                <div class="head">
-                    <div class="helmet"></div>
-                    <div class="visor"></div>
-                </div>
-                <div class="torso">
-                    <div class="armor"></div>
-                    <div class="arm arm-left"></div>
-                    <div class="arm arm-right">
-                        <div class="sword"></div>
+        <!-- Enemy Warrior -->
+        <div class="warrior enemy-warrior" id="enemyWarrior">
+            <div class="warrior-container">
+                <div class="warrior-head">
+                    <div class="helmet">
+                        <div class="visor"></div>
                     </div>
                 </div>
-                <div class="legs">
+                <div class="warrior-torso">
+                    <div class="armor-plate"></div>
+                </div>
+                <div class="warrior-arm arm-left"></div>
+                <div class="warrior-arm arm-right">
+                    <div class="sword">
+                        <div class="sword-blade"></div>
+                        <div class="sword-guard"></div>
+                        <div class="sword-handle"></div>
+                    </div>
+                </div>
+                <div class="warrior-legs">
                     <div class="leg"></div>
                     <div class="leg"></div>
                 </div>
@@ -571,7 +714,7 @@
         <!-- Click button -->
         <button class="click-button pulsing" id="clickBtn">
             <div>⚔️ STRIKE!</div>
-            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">Click to slash</div>
+            <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px;">Click to attack</div>
         </button>
     </div>
 
@@ -583,6 +726,17 @@
     </div>
 
     <script>
+        // Create animated particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (5 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
         let playerHits = 0;
         let enemyHits = 0;
         let timeLeft = 30;
@@ -590,8 +744,8 @@
         let gameStarted = false;
 
         const arena = document.getElementById('arena');
-        const playerSoldier = document.getElementById('playerSoldier');
-        const enemySoldier = document.getElementById('enemySoldier');
+        const playerWarrior = document.getElementById('playerWarrior');
+        const enemyWarrior = document.getElementById('enemyWarrior');
         const playerScoreEl = document.getElementById('playerScore');
         const enemyScoreEl = document.getElementById('enemyScore');
         const timerEl = document.getElementById('timer');
@@ -626,35 +780,35 @@
         }
 
         function playerSlash() {
-            playerSoldier.classList.add('attacking');
+            playerWarrior.classList.add('attacking');
             slashEffect.classList.add('active');
 
             setTimeout(() => {
-                playerSoldier.classList.remove('attacking');
+                playerWarrior.classList.remove('attacking');
                 slashEffect.classList.remove('active');
-            }, 300);
+            }, 400);
 
-            enemySoldier.classList.add('hit');
-            setTimeout(() => enemySoldier.classList.remove('hit'), 300);
+            enemyWarrior.classList.add('hit');
+            setTimeout(() => enemyWarrior.classList.remove('hit'), 300);
 
             playSound('slash');
-            setTimeout(() => playSound('hit'), 100);
+            setTimeout(() => playSound('hit'), 150);
         }
 
         function enemySlash() {
-            enemySoldier.classList.add('attacking');
+            enemyWarrior.classList.add('attacking');
             slashEffect.classList.add('active');
 
             setTimeout(() => {
-                enemySoldier.classList.remove('attacking');
+                enemyWarrior.classList.remove('attacking');
                 slashEffect.classList.remove('active');
-            }, 300);
+            }, 400);
 
-            playerSoldier.classList.add('hit');
-            setTimeout(() => playerSoldier.classList.remove('hit'), 300);
+            playerWarrior.classList.add('hit');
+            setTimeout(() => playerWarrior.classList.remove('hit'), 300);
 
             playSound('slash');
-            setTimeout(() => playSound('hit'), 100);
+            setTimeout(() => playSound('hit'), 150);
         }
 
         function enemyAI() {
@@ -703,9 +857,9 @@
                 arena.classList.add('ko-cam');
 
                 if (playerHits > enemyHits) {
-                    enemySoldier.classList.add('ko');
+                    enemyWarrior.classList.add('ko');
                 } else if (enemyHits > playerHits) {
-                    playerSoldier.classList.add('ko');
+                    playerWarrior.classList.add('ko');
                 }
 
                 setTimeout(() => {
@@ -724,7 +878,7 @@
                     }
 
                     resultEl.classList.add('show');
-                }, 1000);
+                }, 1200);
             }, 500);
         }
 
